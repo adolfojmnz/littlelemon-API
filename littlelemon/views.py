@@ -7,7 +7,7 @@ from .models import MenuItem
 
 
 class MenuView(ListCreateAPIView):
-    queryset = MenuItem.objects.all()
+    queryset = MenuItem.objects.select_related('category').all()
     serializer_class = MenuItemSerializer
 
 
