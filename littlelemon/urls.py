@@ -1,9 +1,14 @@
 from django.urls import path
 
-from .views import MenuView, MenuItemView
+from .views import (
+    MenuListView, MenuItemView, CategoryListView, CategoryItemView,
+)
 
 
 urlpatterns = [
-    path('menu/', MenuView.as_view(), name='menu'),
-    path('menu/<int:pk>/', MenuItemView.as_view(), name='menu-item'),
+    path('menu', MenuListView.as_view()),
+    path('menu/<int:pk>/', MenuItemView.as_view()),
+
+    path('categories', CategoryListView.as_view()),
+    path('categories/<int:pk>', CategoryItemView.as_view(), name='category-detail'),
 ]
