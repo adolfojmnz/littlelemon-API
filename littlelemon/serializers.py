@@ -5,15 +5,18 @@ from decimal import Decimal
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'slug']
 
 
 class MenuItemSerializer(serializers.ModelSerializer):
     after_tax = serializers.SerializerMethodField(method_name='price_after_tax')
-    category = CategorySerializer()
+    category = serializers.HyperlinkedRelatedField(
+        queryset = Category.objects.all(),
+        view_name = 'category-detail',
+    )
 
     class Meta:
         model = MenuItem
