@@ -10,6 +10,9 @@ django-debug-toolbar = "*"
 django-extensions = "*"
 ipython = "*"
 notebook = "*"
+djangorestframework-xml = "*"
+djangorestframework-csv = "*"
+djangorestframework-yaml = "*"
 
 [dev-packages]
 
