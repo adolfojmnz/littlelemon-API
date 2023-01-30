@@ -11,12 +11,8 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 
-class MenuItemSerializer(serializers.ModelSerializer):
+class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
     after_tax = serializers.SerializerMethodField(method_name='price_after_tax')
-    category = serializers.HyperlinkedRelatedField(
-        queryset = Category.objects.all(),
-        view_name = 'category-detail',
-    )
 
     class Meta:
         model = MenuItem
