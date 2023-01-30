@@ -16,7 +16,7 @@ class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = MenuItem
-        fields = ['id', 'title', 'stock', 'category', 'price', 'after_tax']
+        fields = ['id', 'title', 'inventory', 'category', 'price', 'after_tax']
  
     def price_after_tax(self, product:MenuItem):
         return round(product.price * Decimal(1.1), 2)
