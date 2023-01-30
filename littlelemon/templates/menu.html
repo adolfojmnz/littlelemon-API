@@ -1,0 +1,25 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu Items</title>
+</head>
+<body>
+    <table width="100%" style="text-align: left;">
+        <tr>
+            <th>Item</th> <!-- item column heading -->
+            <th>Price</th> <!-- price column heading -->
+            <th>Price After Tax</th> <!-- price after tax column heading -->
+            <th>Stock</th> <!-- stock column heading -->
+        </tr>
+        {% for item in data %}
+        <tr>
+            <td>{{ item.title }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.price_after_tax }}</td>
+            <td>{{ item.stock }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
