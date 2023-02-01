@@ -1,14 +1,14 @@
 from django.urls import path
 
 from .views import (
-    MenuListView, MenuItemView, CategoryListView, CategoryItemView,
+    MenuItemsViewSet, MenuItemViewSet, CategoryItemsViewSet, CategoryItemViewSet,
 )
 
 
 urlpatterns = [
-    path('menu/', MenuListView.as_view()),
-    path('menu/<int:pk>/', MenuItemView.as_view()),
+    path('menu/', MenuItemsViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('menu/<int:pk>/', MenuItemViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='menuitem-detail'),
 
-    path('categories', CategoryListView.as_view()),
-    path('categories/<int:pk>', CategoryItemView.as_view(), name='category-detail'),
+    path('categories', CategoryItemsViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('categories/<int:pk>', CategoryItemViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='category-detail'),
 ]

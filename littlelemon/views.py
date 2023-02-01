@@ -1,26 +1,28 @@
-from rest_framework.generics import (
-    ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView,
-)
+from rest_framework.viewsets import ModelViewSet
 
 from .serializers import MenuItemSerializer, CategorySerializer
 from .models import MenuItem, Category
 
 
-class MenuListView(ListCreateAPIView):
+class MenuItemsViewSet(ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    ordering_fields = ['title', 'price', 'inventory']
+    search_fields = ['title', 'category__title']
+
+
+class MenuItemViewSet(ModelViewSet):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
 
-class MenuItemView(RetrieveUpdateAPIView, DestroyAPIView):
-    queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
-
-
-class CategoryListView(ListCreateAPIView):
+class CategoryItemsViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    ordering_fields = ['title']
+    search_fields = ['title']
 
 
-class CategoryItemView(RetrieveUpdateAPIView, DestroyAPIView):
+class CategoryItemViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
