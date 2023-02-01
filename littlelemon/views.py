@@ -1,31 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes, api_view, throttle_classes
-from rest_framework.response import Response
-
-from .throttle import TenCallPerHour, TenCallPerMinute
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from .serializers import MenuItemSerializer, CategorySerializer
 from .models import MenuItem, Category
 
 
-@api_view()
-@permission_classes([IsAuthenticated])
-@throttle_classes([TenCallPerMinute])
-def secret(request):
-    return Response({'secrete': 'super secret message'})
-
-
-@api_view()
-@permission_classes([IsAuthenticated])
-@throttle_classes([TenCallPerHour])
-def manager_view(request):
-    if request.user.groups.filter(name='Manager').exists():
-        return Response({'secrete': 'super secret message for the manager'})
-    return Response({'message': 'Unauthorized to access the resource'}, status=403)
-
-
 class MenuItemsViewSet(ModelViewSet):
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
     ordering_fields = ['title', 'price', 'inventory']
@@ -33,11 +14,13 @@ class MenuItemsViewSet(ModelViewSet):
 
 
 class MenuItemViewSet(ModelViewSet):
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
 
 class CategoryItemsViewSet(ModelViewSet):
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     ordering_fields = ['title']
@@ -45,5 +28,6 @@ class CategoryItemsViewSet(ModelViewSet):
 
 
 class CategoryItemViewSet(ModelViewSet):
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

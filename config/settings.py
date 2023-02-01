@@ -129,8 +129,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'ten-minute': '10/minute',
-        'ten-hour': '10/hour',
+        'user': '10/minute',
+        'anon': '1/minute',
     },
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
