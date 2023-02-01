@@ -130,7 +130,11 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'user': '10/minute',
-        'anon': '1/minute',
+        'anon': '10/hour',
+
+        'ten-per-hour': '10/hour',
+        'ten-per-minute': '10/minute',
+        'zero': '0/second',
     },
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
