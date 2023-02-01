@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'debug_toolbar',
     'django_extensions',
 
@@ -124,6 +125,13 @@ REST_FRAMEWORK = {
         'rest_framework_csv.renderers.CSVRenderer',
         'rest_framework_yaml.renderers.YAMLRenderer',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'ten-minute': '10/minute',
+        'ten-hour': '10/hour',
+    },
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
