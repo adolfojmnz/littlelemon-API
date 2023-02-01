@@ -36,7 +36,7 @@ from django.core.paginator import Paginator, EmptyPage
 
 def paginator(request, queryset):
         perpage = request.query_params.get('perpage', default=5)
-        perpage = 5 if perpage > 5 else perpage
+        if int(perpage) > 5: perpage = 5
 
         page = request.query_params.get('page', default=1)
 
