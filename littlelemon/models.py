@@ -12,8 +12,8 @@ class MenuItem(models.Model):
 
 
 class Category(models.Model):
+    title = models.CharField(max_length=255)
     slug = models.SlugField()
-    name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

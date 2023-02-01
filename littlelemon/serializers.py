@@ -8,7 +8,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'title', 'slug']
 
 
 class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
