@@ -139,7 +139,7 @@ REST_FRAMEWORK = {
         # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-         'rest_framework.permissions.IsAdminUser'
+        #  'rest_framework.permissions.IsAdminUser'
     ],
     'DEFAULT_THROTTLE_RATES': {
         'user': '10/minute',
