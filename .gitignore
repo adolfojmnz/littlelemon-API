@@ -1,3 +1,6 @@
+# Hidden files/dirs
+.*
+
 # Django #
 *.log
 *.pot
