@@ -15,8 +15,8 @@ djangorestframework-csv = "*"
 djangorestframework-yaml = "*"
 bleach = "*"
 django-filter = "*"
+djangorestframework-simplejwt = "~=5.2.2"
 djoser = "*"
-djangorestframework-simplejwt = "~=5.2.1"
 
 [dev-packages]
 
