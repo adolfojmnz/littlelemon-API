@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a49c94a6922a75b69c7bde6a39a347b67e1a754a739a0c9eafffbc256180c7fe"
+            "sha256": "1e116d53ea946bd5bdf52808655a31ef015b260280e7ade272a3e73af5a6406a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -262,6 +262,13 @@
             "index": "pypi",
             "version": "==22.1"
         },
+        "django-templated-mail": {
+            "hashes": [
+                "sha256:8db807effebb42a532622e2d142dfd453dafcd0d7794c4c3332acb90656315f9",
+                "sha256:f7127e1e31d7cad4e6c4b4801d25814d4b8782627ead76f4a75b3b7650687556"
+            ],
+            "version": "==1.1.1"
+        },
         "djangorestframework": {
             "hashes": [
                 "sha256:579a333e6256b09489cbe0a067e66abe55c6595d8926be6b99423786334350c8",
@@ -276,6 +283,14 @@
             ],
             "index": "pypi",
             "version": "==2.1.1"
+        },
+        "djangorestframework-simplejwt": {
+            "hashes": [
+                "sha256:4c0d2e2513e12587d93501ac091781684a216c3ee614eb3b5a10586aef5ca845",
+                "sha256:d27d4bcac2c6394f678dea8b4d0d511c6e18a7f2eb8aaeeb8a7de601aeb77c42"
+            ],
+            "index": "pypi",
+            "version": "==5.2.2"
         },
         "djangorestframework-xml": {
             "hashes": [
@@ -292,6 +307,14 @@
             ],
             "index": "pypi",
             "version": "==2.0.0"
+        },
+        "djoser": {
+            "hashes": [
+                "sha256:5cd98687cdb6d87af632c45fe6268e09c0774b3ba89db02038727ca6e711c64d",
+                "sha256:6b5f225122d30f3f84a46032d8f98a03412903b225d418d373463275ee1d5c39"
+            ],
+            "index": "pypi",
+            "version": "==2.0.5"
         },
         "executing": {
             "hashes": [
@@ -669,6 +692,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2.14.0"
+        },
+        "pyjwt": {
+            "hashes": [
+                "sha256:69285c7e31fc44f68a1feb309e948e0df53259d579295e6cfe2b1792329f05fd",
+                "sha256:d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==2.6.0"
         },
         "pyrsistent": {
             "hashes": [
