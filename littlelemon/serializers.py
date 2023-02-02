@@ -44,6 +44,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
  
  
 class RatingSerializer(serializers.ModelSerializer): 
+    prrice = serializers.DecimalField
     user = serializers.PrimaryKeyRelatedField( 
         queryset = User.objects.all(), 
         default = serializers.CurrentUserDefault() 
@@ -55,7 +56,7 @@ class RatingSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset = Rating.objects.all(),
-                fields = ['user', 'menuitem_id', 'rating']
+                fields = ['user', 'menuitem_id']
             )
         ]
         extra_kwargs = {
