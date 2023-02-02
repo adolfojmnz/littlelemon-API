@@ -24,3 +24,6 @@ class Rating(models.Model):
     menuitem_id = models.SmallIntegerField()
     rating = models.SmallIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} rate on menuitem #{self.menuitem_id}'
