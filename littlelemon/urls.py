@@ -1,11 +1,13 @@
 from django.urls import path
 
 from .views import (
-    MenuItemsViewSet, MenuItemViewSet, CategoryItemsViewSet, CategoryItemViewSet,
+    MenuItemsViewSet, MenuItemViewSet, CategoryItemsViewSet, CategoryItemViewSet, RatingsView,
 )
 
 
 urlpatterns = [
+    path('ratings', RatingsView.as_view({'get': 'list'})),
+
     path('menu', MenuItemsViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('menu/<int:pk>', MenuItemViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='menuitem-detail'),
 
