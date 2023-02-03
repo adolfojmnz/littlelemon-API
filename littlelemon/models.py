@@ -8,10 +8,16 @@ class MenuItem(models.Model):
     featured = models.BooleanField(db_index=True)
     category = models.ForeignKey('littlelemon.Category', on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.title
+
 
 class Category(models.Model):
     title = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255)
+
+    def __str__(self):
+        return self.title
 
 
 class Cart(models.Model):
@@ -22,7 +28,10 @@ class Cart(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
     class Meta:
-        unique_together = ['menuitem', 'user']
+        unique_together = ['user', 'menuitem']
+
+    def __str__(self):
+        return self.user + 'cart'
 
 
 class Order(models.Model):
@@ -37,6 +46,9 @@ class Order(models.Model):
     total = models.DecimalField(max_digits=6, decimal_places=2)
     date = models.DateField(auto_now_add=True, db_index=True)
 
+    def __str__(self):
+        return self.user + 'order'
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -47,3 +59,6 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = ['order', 'menuitem']
+
+    def __str__(self):
+        return self.order + 'items'
