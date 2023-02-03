@@ -21,6 +21,7 @@ class MenuItemListViewSet(ModelViewSet):
 
 class MenuItemDetailViewSet(ModelViewSet):
     model = MenuItem
+    queryset = model.objects.all()
     serializer_class = MenuItemSerializer
 
 
@@ -32,6 +33,7 @@ class CategoryListViewSet(ModelViewSet):
 
 class CategoryDetailViewSet(ModelViewSet):
     model = Category
+    queryset = model.objects.all()
     serializer_class = CategorySerializer
 
 
@@ -43,6 +45,7 @@ class CartListViewSet(ModelViewSet):
 
 class CartDetailViewSet(ModelViewSet):
     model = Cart
+    queryset = model.objects.all()
     serializer_class = CartSerializer
 
 
@@ -54,6 +57,7 @@ class OrderListViewSet(ModelViewSet):
 
 class OrderDetailViewSet(ModelViewSet):
     model = Order
+    queryset = model.objects.all()
     serializer_class = OrderSerializer
 
 
@@ -65,4 +69,5 @@ class OrderItemListViewSet(ModelViewSet):
 
 class OrderItemDetailViewSet(ModelViewSet):
     model = OrderItem
+    queryset = model.objects.all()
     serializer_class = OrderItemSerializer
