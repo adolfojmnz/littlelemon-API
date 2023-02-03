@@ -4,11 +4,12 @@ from littlelemon.models import MenuItem, Category, Cart, Order, OrderItem
 
 
 class MenuItemSerializer(serializers.ModelSerializer):
-    category = serializers.HyperlinkedIdentityField(view_name='category-detail')
+    category = serializers.HyperlinkedIdentityField(view_name='category-detail', read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = MenuItem
-        fields = ['title', 'price', 'featured', 'category_id']
+        fields = ['title', 'price', 'featured', 'category', 'category_id']
 
 
 class CategorySerializer(serializers.ModelSerializer):
