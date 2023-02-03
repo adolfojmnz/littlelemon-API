@@ -37,8 +37,10 @@ class MenuItemSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         attrs['title'] = bleach.clean(attrs['title'])
-        if attrs['price'] < 2: raise serializers.ValidationError('The price should be greater or equal than 2')
-        if attrs['inventory'] < 0: raise serializers.ValidationError('The number of items in inventoy should be greater than 0')
+        if attrs['price'] < 2: 
+            raise serializers.ValidationError('The price should be greater or equal than 2')
+        if attrs['inventory'] < 0:
+            raise serializers.ValidationError('The number of items in inventoy should be greater than 0')
         return super().validate(attrs)
 
  
