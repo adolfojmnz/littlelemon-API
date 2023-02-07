@@ -13,7 +13,6 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework import status
 
-
 from littlelemon.models import (
     MenuItem, Category,
     OrderItem, Cart, Purchase, Order,
@@ -37,45 +36,27 @@ from .serializers import (
     PurchaseSerializer,
 )
 
-from .helpers import user_is_requested_user
-from .mixins import RetrieveUpdateDestroyAPIViewMixin
+from .mixins import (
+    RetrieveUpdateDestroyAPIViewMixin,
+    GroupManagerMixin,
+    UserIsRequestedUserMixin,
+    CustomerCanSeeMixin,
+    CartViewHelperMixin,
+    OrderItemHelperMixin,
+    OrderListHelperMixin,
+)
 
 
-class GroupManagerMixin:
-    group_name = ''
-
-    def post(self, request):
-        try:
-            user = User.objects.get(username=request.data.get('username'))
-            manager_group = Group.objects.get(name=self.group_name)
-            manager_group.user_set.add(user)
-            manager_group.save()
-            return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
-        except User.DoesNotExist:
-            return Response({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def delete(self, request):
-        try:
-            user = User.objects.get(username=request.data.get('username'))
-            manager_group = Group.objects.get(name=self.group_name)
-            manager_group.user_set.remove(user)
-            manager_group.save()
-            return Response({'message': 'user removed from the group'}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-class GroupListViewSet(ModelViewSet):
+class GroupListViewSet(ListCreateAPIView):
     model = Group
     queryset = model.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = [IsManager]
 
-    def check_permissions(self, request):
-        if request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            self.permission_classes = []
-        return super().check_permissions(request)
+    def get(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='SysAdmin'):
+            self.queryset = self.queryset.exclude(name='SysAdmin')
+        return super().list(request, *args, **kwargs)
 
 
 class GroupDetailView(ModelViewSet):
@@ -84,12 +65,15 @@ class GroupDetailView(ModelViewSet):
     serializer_class = GroupSerializer
 
     def check_permissions(self, request):
+        requested_group = Group.objects.get(pk=request.data.get('pk'))
         if request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            requested_group_pk = request.parser_context['kwargs'].get('pk')
-            if Group.objects.get(pk=requested_group_pk).name in ['Manager', 'SysAdmin']:
+            if requested_group.name in ['SysAdmin']:
                 self.permission_classes = [IsSystemAdministrotor]
+            else: self.permission_classes = [IsManager]
+        else:
+            if requested_group.name not in ['SysAdmin', 'Manager']:
+                self.permission_classes = [IsManager]
+            else: self.permission_classes = [IsSystemAdministrotor]
         return super().check_permissions(request)
 
 
@@ -98,6 +82,7 @@ class SysAdminListViewSet(ModelViewSet):
     queryset = model.objects.filter(groups__name='SysAdmin')
     serializer_class = UserSerializer
     permission_classes = [IsSystemAdministrotor]
+
 
 class SysAdminDetailViewSet(SysAdminListViewSet):
     pass
@@ -117,14 +102,14 @@ class ManagerListViewSet(GroupManagerMixin, ListAPIView):
         return super().check_permissions(request)
 
 
-class ManagerDetailViewSet(ModelViewSet):
+class ManagerDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
     model = User
     queryset = User.objects.filter(groups__name='Manager').exclude(groups__name='SysAdmin')
     serializer_class = UserSerializer
 
     def check_permissions(self, request):
         if request.method in ['GET', 'PATCH', 'PUT', 'DELETE']:
-            if user_is_requested_user(request):
+            if self.user_is_requested_user(request):
                 self.permission_classes = [IsManager]
             else: self.permission_classes = [IsSystemAdministrotor]
         else:
@@ -140,13 +125,13 @@ class DeliveryCrewListViewSet(GroupManagerMixin, ListAPIView):
     group_name = 'Delivery Crew'
     
 
-class DeliveryCrewDetailViewSet(ModelViewSet):
+class DeliveryCrewDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
     model = User
     queryset = User.objects.filter(groups__name='Delivery Crew').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
 
     def check_permissions(self, request):
-        if user_is_requested_user(request):
+        if self.user_is_requested_user(request):
             self.permission_classes = [IsDeliveryCrew]
         else:
             self.permission_classes = [IsManager]
@@ -165,107 +150,51 @@ class CustomerListViewSet(ModelViewSet):
             self.permission_classes = [IsManager]
         return super().check_permissions(request)
 
-class CustomerDetailViewSet(ModelViewSet):
+
+class CustomerDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
     model = User
     queryset = User.objects.filter(groups__name='Customer').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
 
     def check_permissions(self, request):
-        if user_is_requested_user(request):
+        if self.user_is_requested_user(request):
             self.permission_classes = [IsCustomer]
         else:
             self.permission_classes = [IsManager]
         return super().check_permissions(request)
 
 
-class CategoryListViewSet(ModelViewSet):
+class CategoryListViewSet(CustomerCanSeeMixin, ModelViewSet):
     model = Category
     queryset = model.objects.all()
     serializer_class = CategorySerializer
 
-    def check_permissions(self, request):
-        if not request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            self.permission_classes = {IsCustomer}
-        return super().check_permissions(request)
 
-
-class CategoryDetailViewSet(ModelViewSet):
+class CategoryDetailViewSet(CustomerCanSeeMixin, ModelViewSet):
     model = Category
     queryset = model.objects.all()
     serializer_class = CategorySerializer
 
-    def check_permissions(self, request):
-        if not request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            self.permission_classes = {IsCustomer}
-        return super().check_permissions(request)
 
-
-class MenuItemListViewSet(ModelViewSet):
+class MenuItemListViewSet(CustomerCanSeeMixin, ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
 
-    def check_permissions(self, request):
-        if not request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            self.permission_classes = [IsCustomer]
-        return super().check_permissions(request)
 
-
-class MenuItemDetailViewSet(ModelViewSet):
+class MenuItemDetailViewSet(CustomerCanSeeMixin, ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
 
-    def check_permissions(self, request):
-        if not request.method in ['GET']:
-            self.permission_classes = [IsManager]
-        else:
-            self.permission_classes = [IsCustomer]
-        return super().check_permissions(request)
 
-
-class OrderItemListViewSet(ListCreateAPIView, DestroyAPIView):
+class OrderItemListViewSet(OrderItemHelperMixin, RetrieveAPIView):
     model = OrderItem
     related_model = MenuItem
     queryset = model.objects.all()
     serializer_class = OrderItemSerializer
     permission_classes = [IsCustomer]
 
-    def data_dict_constructor(self, request):
-        try:
-            related_object = self.related_model.objects.get(pk=request.data.get('id'))
-            quantity = request.data.get('quantity')
-            quantity = 1 if quantity is None else int(quantity)
-            unit_price = related_object.price
-            price = unit_price * quantity
-
-            data = {
-                'user': request.user,
-                'related_object': related_object,
-                'quantity': quantity,
-                'unit_price': unit_price,
-                'price': price,
-            }
-            return data
-        except self.model.DoesNotExist:
-            return None
-
-    def create_object(self, data):
-        model_object = self.model.objects.create(
-            user = data['user'],
-            menuitem = data['related_object'],
-            quantity = data['quantity'],
-            unit_price = data['unit_price'],
-            price = data['price'],
-        )
-        return model_object
-    
     def get(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(user=request.user)
         return super().get(request, *args, **kwargs)
@@ -278,7 +207,7 @@ class OrderItemListViewSet(ListCreateAPIView, DestroyAPIView):
         serialized_object = self.serializer_class(model_object)
         return Response(serialized_object.data, status=status.HTTP_201_CREATED)
         
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request):
         try:
             if not request.data.get('id') is None:
                 instance = self.queryset.filter(user=request.user).get(pk=request.data.get('id'))
@@ -290,7 +219,7 @@ class OrderItemListViewSet(ListCreateAPIView, DestroyAPIView):
             return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class OrderItemDetailViewSet(RetrieveAPIView):
+class OrderItemDetailViewSet(RetrieveUpdateAPIView):
     model = OrderItem
     queryset = model.objects.all()
     serializer_class = OrderItemSerializer
@@ -305,56 +234,13 @@ class OrderItemDetailViewSet(RetrieveAPIView):
             return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
     
 
-class CartViewSet(RetrieveUpdateDestroyAPIView):
+class CartViewSet(CartViewHelperMixin, RetrieveUpdateDestroyAPIView):
     model = Cart
     queryset = model.objects.all()
     serializer_class = CartSerializer
     permission_classes = [IsCustomer]
     related_model = OrderItem
 
-    def get_model_object(self, request):
-        try:
-            model_object = self.queryset.get(user=request.user)
-        except self.model.DoesNotExist:
-            model_object = self.models.objects.create(user=request.user)
-            model_object.save()
-        finally:
-            return model_object
-    
-    def get_related_object(self, request, model_object=None):
-        if model_object is None:
-            model_object = self.get_model_object(request) 
-        try:
-            id = int(request.data.get('id'))
-            related_object = self.related_model.objects.filter(user=request.user).get(pk=id)
-            return related_object
-        except self.related_model.DoesNotExist:
-            return None
-    
-    def serialize_object_response(self, request, model_object, status=status.HTTP_200_OK):
-        serialized_data = self.serializer_class(model_object, context={'request': request})
-        return Response(serialized_data.data, status=status)
-
-    def add_or_delete(self, request, add=True):
-        model_object = self.get_model_object(request)
-        related_object = self.get_related_object(request, model_object)
-        if related_object is None:
-            return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
-        if add is True:
-            model_object.orderitems.add(related_object)
-            status_code = status.HTTP_201_CREATED
-        else:
-            model_object.orderitems.remove(related_object)
-            status_code = status.HTTP_200_OK
-        model_object.save()
-        return self.serialize_object_response(request, model_object, status=status_code)
-    
-    def clear_orderitems(self, request):
-        model_object = self.get_model_object(request)
-        model_object.orderitems.clear()
-        model_object.save()
-        return self.serialize_object_response(request, model_object)
-    
     def get(self, request):
         model_object = self.get_model_object(request)
         serialized_data = self.serializer_class(model_object, context={'request': request}) 
@@ -387,33 +273,11 @@ class PurchaseDetailView(RetrieveAPIView):
     permission_classes = [IsCustomer]
     
 
-class OrderListViewSet(ListCreateAPIView):
+class OrderListViewSet(OrderListHelperMixin, ListCreateAPIView):
     model = Order
     queryset = model.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsCustomer]
-
-    def get_user_cart(self, request):
-        try:
-            return Cart.objects.get(user=request.user)
-        except Cart.DoesNotExist:
-            return None
-    
-    def create_purchase_record(self, request):
-        # try:
-        user_cart = self.get_user_cart(request)
-        purchase = Purchase.objects.create(user=request.user)
-        purchase.orderitems.set(user_cart.orderitems.all())
-        purchase.save()
-        return purchase
-        # except:
-        #     return None
-    
-    def get_purchase_cost(self, purchase_record):
-        total_cost = 0
-        for orderidem in purchase_record.orderitems.all():
-            total_cost += orderidem.price
-        return total_cost
 
     def get(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(user=request.user)
@@ -421,20 +285,13 @@ class OrderListViewSet(ListCreateAPIView):
     
     def post(self, request):
         """
-        Take all orderitems present in the Cart table and place them in a new Purchase instance
+        Take all orderitems present in the Cart table and place them in a new Purchase instance,
         relate that Purchase instance to a new Order instance
         """
         user_cart = self.get_user_cart(request)
-        purchase_record = self.create_purchase_record(request)
-        if purchase_record is None:
-            return Response({'message': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
-        order_object = self.model.objects.create(
-            user = request.user,
-            purchase = purchase_record,
-            total = self.get_purchase_cost(purchase_record)
-        )
+        purchase_record = self.create_purchase_record(request, user_cart)
+        order_object = self.create_order_object(request, purchase_record)
         user_cart.orderitems.clear()
-        order_object.save()
         user_cart.save()
         
         serialized_object = self.serializer_class(order_object)
