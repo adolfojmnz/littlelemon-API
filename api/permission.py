@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import BasePermission
 
 
 class PermissionBaseMixin(BasePermission):

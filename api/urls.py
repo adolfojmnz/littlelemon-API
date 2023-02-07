@@ -25,7 +25,7 @@ DETAIL = {'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete
 urlpatterns = [
     path('users/<int:pk>', UserDetailView.as_view(), name='user-detail'),
 
-    path('groups', GroupListViewSet.as_view(LIST)),
+    path('groups', GroupListViewSet.as_view()),
     path('groups/<int:pk>', GroupDetailView.as_view(DETAIL)),
     path('groups/admins', SysAdminListViewSet.as_view(LIST)),
     path('groups/admins/<int:pk>', SysAdminDetailViewSet.as_view(DETAIL)),
