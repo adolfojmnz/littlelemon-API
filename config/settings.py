@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     # third party
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'djoser',
 
     # my apps
     'littlelemon',
@@ -135,13 +135,31 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_USER_AUTHENTICATION_CLASS': [
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',
+        'rest_framework_csv.renderers.CSVRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('JWT',),
+    # 'AUTH_HEADER_TYPES': ('JWT',), # if enable, use JWT as header
+}
+
+DJOSER = {
+    'USER_ID_FIELD': 'username',
 }
