@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 
 from littlelemon.models import (
-    MenuItem, Category, Cart, Order, OrderItem, Purchase,
+    MenuItem, Category, Cart, Order, OrderItem, Purchase, PurchaseItem,
 )
 
 
@@ -13,7 +13,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
@@ -36,7 +36,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'slug']
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = OrderItem
@@ -48,16 +48,24 @@ class CartSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['id', 'orderitems']
-    
+        fields = ['id', 'user', 'orderitems']
+        read_only = ['user']
 
-class PurchaseSerializer(serializers.ModelSerializer):
+
+class PurchaseSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = ['user', 'orderitems', 'date']
+        fields = ['user', 'purchaseitems', 'date']
         read_only = ['user', 'date']
-        
+
+
+class PurchaseItemSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = PurchaseItem
+        fields = ['id', 'user', 'menuitem', 'quantity', 'unit_price', 'price']
+
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     
