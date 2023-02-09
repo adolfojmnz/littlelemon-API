@@ -41,14 +41,24 @@ class Cart(models.Model):
     def __str__(self):
         return f'{self.user.username} cart'
 
+class PurchaseItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    menuitem = models.ForeignKey(MenuItem, on_delete=models.PROTECT)
+    quantity = models.SmallIntegerField()
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.user.username} purchase items'
+
 
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default=0)
-    orderitems = models.ManyToManyField(OrderItem)
+    purchaseitems = models.ManyToManyField(PurchaseItem, default=0)
     date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.user.username} purchase on {str(self.date).split(" ")}'
+        return f'{self.user.username} purchase on {str(self.date).split(" ")[0]}'
 
 
 class Order(models.Model):
