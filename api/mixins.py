@@ -12,13 +12,28 @@ from .permission import (
 )
 
 from littlelemon.models import (
-    MenuItem,
     Category,
+    MenuItem,
     OrderItem,
     Cart,
     Order,
+    PurchaseItem,
     Purchase,
 )
+
+
+class ComonUtilsMixin:
+
+    def object_serialized_response(self, request, cart_object, status=status.HTTP_200_OK):
+        serialized_data = self.serializer_class(cart_object, context={'request': request})
+        return Response(serialized_data.data, status=status)
+
+    def get_requested_user(self, **kwargs):
+        user_queryset = User.objects.filter(groups__name='Customer').exclude(groups__name='Manager')
+        try:
+            return user_queryset.get(pk=kwargs['pk'])
+        except User.DoesNotExist:
+            return None
 
 
 class ListCreateAPIViewMixin(ListCreateAPIView):
@@ -97,109 +112,131 @@ class CustomerCanSeeMixin:
         return super().check_permissions(request)
 
 
-class CartViewHelperMixin:
+class CartViewHelperMixin(ComonUtilsMixin):
 
-    def get_model_object(self, request):
+    def get_or_create_cart_object(self, user):
         try:
-            model_object = self.queryset.get(user=request.user)
+            return self.model.objects.get(user=user)
         except self.model.DoesNotExist:
-            model_object = self.models.objects.create(user=request.user)
-            model_object.save()
-        finally:
-            return model_object
-    
-    def get_related_object(self, request, model_object=None):
-        if model_object is None:
-            model_object = self.get_model_object(request) 
+            cart_object = self.model.objects.create(user=user)
+            cart_object.save()
+            return cart_object
+
+    def create_order_item_obj(self, request, user, menu_item_obj):
+        quantity = request.data.get('quantity')
+        quantity = 1 if quantity is None else int(quantity)
+        unit_price = menu_item_obj.price
+        price = unit_price * quantity
+
+        order_item_obj = OrderItem.objects.create(
+            user = user,
+            menuitem = menu_item_obj,
+            quantity = quantity,
+            unit_price = unit_price,
+            price = price, 
+        )
+        return order_item_obj
+
+    def get_order_item(self, request, user):
         try:
             id = int(request.data.get('id'))
-            related_object = self.related_model.objects.filter(user=request.user).get(pk=id)
-            return related_object
-        except self.related_model.DoesNotExist:
+            order_item = OrderItem.objects.filter(user=user).get(pk=id)
+            return order_item
+        except OrderItem.DoesNotExist:
             return None
+
+    def add_order_item_to_cart(self, order_item_obj, user):
+        cart_object = self.get_or_create_cart_object(user)
+        cart_object.orderitems.add(order_item_obj)
+        cart_object.save()
     
-    def serialize_object_response(self, request, model_object, status=status.HTTP_200_OK):
-        serialized_data = self.serializer_class(model_object, context={'request': request})
-        return Response(serialized_data.data, status=status)
-
-    def add_or_delete(self, request, add=True):
-        model_object = self.get_model_object(request)
-        related_object = self.get_related_object(request, model_object)
-        if related_object is None:
-            return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
-        if add is True:
-            model_object.orderitems.add(related_object)
-            status_code = status.HTTP_201_CREATED
-        else:
-            model_object.orderitems.remove(related_object)
-            status_code = status.HTTP_200_OK
-        model_object.save()
-        return self.serialize_object_response(request, model_object, status=status_code)
+    def delete_order_item_from_cart(self, order_item_obj, user):
+        cart_object = self.get_or_create_cart_object(user)
+        cart_object.orderitems.remove(order_item_obj)
+        cart_object.save()
     
-    def clear_orderitems(self, request):
-        model_object = self.get_model_object(request)
-        model_object.orderitems.clear()
-        model_object.save()
-        return self.serialize_object_response(request, model_object)
+    def clear_orderitems(self, request, user):
+        cart_object = self.get_or_create_cart_object(user)
+        cart_object.orderitems.clear()
+        cart_object.save()
 
 
-class OrderItemHelperMixin:
+class OrderItemHelperMixin(ComonUtilsMixin):
 
-    def data_dict_constructor(self, request):
+    def data_dict_constructor(self, request, user, **kwargs):
         try:
-            related_object = self.related_model.objects.get(pk=request.data.get('id'))
+            menu_item_obj = MenuItem.objects.get(pk=request.data.get('id'))
             quantity = request.data.get('quantity')
             quantity = 1 if quantity is None else int(quantity)
-            unit_price = related_object.price
+            unit_price = menu_item_obj.price
             price = unit_price * quantity
 
             data = {
-                'user': request.user,
-                'related_object': related_object,
+                'user': user,
+                'related_object': menu_item_obj,
                 'quantity': quantity,
                 'unit_price': unit_price,
                 'price': price,
             }
             return data
-        except self.model.DoesNotExist:
+        except MenuItem.DoesNotExist:
             return None
 
-    def create_object(self, data):
-        model_object = self.model.objects.create(
+    def create_order_item_obj(self, data):
+        order_item_obj = OrderItem.objects.create(
             user = data['user'],
             menuitem = data['related_object'],
             quantity = data['quantity'],
             unit_price = data['unit_price'],
             price = data['price'],
         )
-        return model_object
+        return order_item_obj
 
 
-class OrderListHelperMixin:
+class OrderListHelperMixin(ComonUtilsMixin):
 
-    def get_user_cart(self, request):
+    def get_user_cart(self, user):
         try:
-            return Cart.objects.get(user=request.user)
+            return Cart.objects.get(user=user)
         except Cart.DoesNotExist:
             return None
     
-    def create_purchase_record(self, request, user_cart):
-        purchase = Purchase.objects.create(user=request.user)
-        purchase.orderitems.set(user_cart.orderitems.all())
+    def create_purchase_item_from_order_item(self, order_item):
+        purchase_item = PurchaseItem.objects.create(
+            user = order_item.user,
+            menuitem = order_item.menuitem,
+            quantity = order_item.quantity,
+            unit_price = order_item.unit_price,
+            price = order_item.price,
+        )
+        purchase_item.save()
+        return purchase_item
+    
+    def create_purchase_record(self, user, user_cart):
+        purchase = Purchase.objects.create(user=user)
+        for order_item in user_cart.orderitems.all():
+            purchase_item = self.create_purchase_item_from_order_item(order_item)
+            purchase.purchaseitems.add(purchase_item)
         purchase.save()
         return purchase
     
     def get_purchase_cost(self, purchase_record):
         total_cost = 0
-        for orderidem in purchase_record.orderitems.all():
-            total_cost += orderidem.price
+        for purchase_item in purchase_record.purchaseitems.all():
+            total_cost += purchase_item.price
         return total_cost
     
-    def create_order_object(self, request, purchase_record):
+    def create_order_object(self, user, purchase_record):
         order_object = self.model.objects.create(
-            user = request.user,
+            user = user,
             purchase = purchase_record,
             total = self.get_purchase_cost(purchase_record)
         )
         order_object.save()
         return order_object
+    
+    def delete_user_order_items(self, user):
+        order_items = OrderItem.objects.filter(user=user).delete()
+        if OrderItem.objects.filter(user=user).all():
+            return False
+        return True

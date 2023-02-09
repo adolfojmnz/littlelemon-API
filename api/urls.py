@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (
-    UserDetailView,
+    UserDetailView, UserListView,
     GroupListViewSet, GroupDetailView,
     SysAdminListViewSet, SysAdminDetailViewSet,
     ManagerListViewSet, ManagerDetailViewSet,
@@ -9,13 +9,10 @@ from .views import (
     CustomerListViewSet, CustomerDetailViewSet,
     MenuItemListViewSet, MenuItemDetailViewSet,
     CategoryListViewSet, CategoryDetailViewSet,
-    OrderItemListViewSet,
-    OrderItemDetailViewSet,
-    CartViewSet,
-    OrderListViewSet,
-    OrderDetailViewSet,
-    PurchaseListView,
-    PurchaseDetailView,
+    OrderItemListView, OrderItemDetailView,
+    CartView,
+    OrderListView, OrderDetailView,
+    PurchaseListView, PurchaseDetailView,
 )
 
 LIST = {'get': 'list', 'post': 'create'}
@@ -23,6 +20,7 @@ DETAIL = {'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete
 
 
 urlpatterns = [
+    path('users', UserListView.as_view()),
     path('users/<int:pk>', UserDetailView.as_view(), name='user-detail'),
 
     path('groups', GroupListViewSet.as_view()),
@@ -38,18 +36,19 @@ urlpatterns = [
 
     path('menu-items', MenuItemListViewSet.as_view(LIST)),
     path('menu-items/<int:pk>', MenuItemDetailViewSet.as_view(DETAIL), name='menuitem-detail'),
-
     path('categories', CategoryListViewSet.as_view(LIST)),
     path('categories/<int:pk>', CategoryDetailViewSet.as_view(DETAIL), name='category-detail'),
 
-    path('cart', CartViewSet.as_view()),
+    path('cart', CartView.as_view()),
+    path('order-items', OrderItemListView.as_view()),
+    path('order-items/<int:pk>', OrderItemDetailView.as_view(), name='orderitem-detail'),
 
-    path('order-items', OrderItemListViewSet.as_view()),
-    path('order-items/<int:pk>', OrderItemDetailViewSet.as_view(), name='orderitem-detail'),
+    path('orders', OrderListView.as_view()),
+    path('orders/<int:pk>', OrderDetailView.as_view(), name='order-detail'),
 
-    path('purchases', PurchaseListView().as_view()),
-    path('purchases/<int:pk>', PurchaseDetailView().as_view(), name='purchase-detail'),
+    path('purchases', PurchaseListView.as_view()),
+    path('purchases/<int:pk>', PurchaseDetailView.as_view(), name='purchase-detail'),
 
-    path('orders', OrderListViewSet.as_view()),
-    path('orders/<int:pk>', OrderDetailViewSet.as_view(DETAIL)),
+    path('purchase-items', PurchaseListView.as_view()),
+    path('purchase-items/<int:pk>', PurchaseDetailView.as_view(), name='purchase-detail'),
 ]
