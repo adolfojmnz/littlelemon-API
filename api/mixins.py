@@ -22,10 +22,60 @@ from littlelemon.models import (
 )
 
 
-class ComonUtilsMixin:
+class UserHelperMixin:
 
-    def object_serialized_response(self, request, cart_object, status=status.HTTP_200_OK):
-        serialized_data = self.serializer_class(cart_object, context={'request': request})
+    def user_is_requested_user(self, request):
+        user_pk = request.user.pk
+        requested_user_pk = request.parser_context['kwargs'].get('pk')
+        if user_pk == requested_user_pk and requested_user_pk is not None:
+            return True
+        return False
+
+    def user_in_group(self, request, group_name=''):
+        user = request.user
+        if user.groups.filter(name=group_name):
+            return True
+        return False
+
+    def requested_user_in_group(self, request, group_name=''):
+        user_pk = request.parser_context['kwargs'].get('pk')
+        user = User.objects.get(pk=user_pk)
+        if user.groups.filter(name=group_name):
+            return True
+        return False
+    
+    def user_is_unathentictaed(self, request):
+        return request.user.is_anonymous
+
+    def user_is_customer(self, request):
+        return self.user_in_group(request, group_name='Customer')
+
+    def user_is_delivery_crew(self, request):
+        return self.user_in_group(request, group_name='Delivery Crew')
+
+    def user_is_manager(self, request):
+        return self.user_in_group(request, group_name='Manager')
+
+    def user_is_admin(self, request):
+        return self.user_in_group(request, group_name='SysAdmin')
+
+    def requested_user_is_customer(self, request):
+        return self.requested_user_in_group(request, group_name='Customer')
+
+    def requested_user_is_delivery_crew(self, request):
+        return self.requested_user_in_group(request, group_name='Delivery Crew')
+
+    def requested_user_is_manager(self, request):
+        return self.requested_user_in_group(request, group_name='Manager')
+
+    def requested_user_is_admin(self, request):
+        return self.requested_user_in_group(request, group_name='SysAdmin')
+
+
+class CommonUtilsMixin:
+
+    def object_serialized_response(self, request, object, status=status.HTTP_200_OK):
+        serialized_data = self.serializer_class(object, context={'request': request})
         return Response(serialized_data.data, status=status)
 
     def get_requested_user(self, **kwargs):
@@ -68,38 +118,34 @@ class RetrieveUpdateDestroyAPIViewMixin(RetrieveUpdateDestroyAPIView):
             return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class GroupManagerMixin:
+class GroupListHelperMixin:
     group_name = ''
 
     def post(self, request):
         try:
-            user = User.objects.get(username=request.data.get('username'))
-            manager_group = Group.objects.get(name=self.group_name)
-            manager_group.user_set.add(user)
-            manager_group.save()
+            user_id = int(request.data.get('id'))
+            user = User.objects.get(pk=user_id)
+            group = Group.objects.get(name=self.group_name)
+            group.user_set.add(user)
+            group.save()
             return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
+        except ValueError:
+            return Response({'id': 'a valid integer is required'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
-            return Response({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def delete(self, request):
+            return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class GroupDetailHelperMixin:
+
+    def delete(self, request, *args, **kwargs):
         try:
-            user = User.objects.get(username=request.data.get('username'))
-            manager_group = Group.objects.get(name=self.group_name)
-            manager_group.user_set.remove(user)
-            manager_group.save()
+            user = User.objects.get(pk=kwargs['pk'])
+            group = Group.objects.get(name=self.group_name)
+            group.user_set.remove(user)
+            group.save()
             return Response({'message': 'user removed from the group'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-class UserIsRequestedUserMixin:
-
-    def user_is_requested_user(self, request):
-        current_user_pk = request.user.pk
-        requested_user_pk = request.parser_context['kwargs'].get('pk')
-        if current_user_pk == requested_user_pk and requested_user_pk is not None:
-            return True
-        return False
+            return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CustomerCanSeeMixin:
@@ -112,7 +158,7 @@ class CustomerCanSeeMixin:
         return super().check_permissions(request)
 
 
-class CartViewHelperMixin(ComonUtilsMixin):
+class CartViewHelperMixin(CommonUtilsMixin):
 
     def get_or_create_cart_object(self, user):
         try:
@@ -161,7 +207,7 @@ class CartViewHelperMixin(ComonUtilsMixin):
         cart_object.save()
 
 
-class OrderItemHelperMixin(ComonUtilsMixin):
+class OrderItemHelperMixin(CommonUtilsMixin):
 
     def data_dict_constructor(self, request, user, **kwargs):
         try:
@@ -193,7 +239,7 @@ class OrderItemHelperMixin(ComonUtilsMixin):
         return order_item_obj
 
 
-class OrderListHelperMixin(ComonUtilsMixin):
+class OrderListHelperMixin(CommonUtilsMixin):
 
     def get_user_cart(self, user):
         try:
@@ -240,3 +286,7 @@ class OrderListHelperMixin(ComonUtilsMixin):
         if OrderItem.objects.filter(user=user).all():
             return False
         return True
+
+
+class PurchaseDetailHelperMixin(CommonUtilsMixin):
+    pass
