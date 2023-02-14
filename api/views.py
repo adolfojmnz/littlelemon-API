@@ -28,6 +28,7 @@ from .permission import (
     IsManager,
     IsDeliveryCrew,
     IsCustomer,
+    IsCustomerOrDeliveryCrew,
 )
 
 from .serializers import (
@@ -44,40 +45,67 @@ from .serializers import (
 
 from .mixins import (
     RetrieveUpdateDestroyAPIViewMixin,
-    GroupManagerMixin,
-    UserIsRequestedUserMixin,
+    GroupListHelperMixin,
+    GroupDetailHelperMixin,
+    UserHelperMixin,
     CustomerCanSeeMixin,
     CartViewHelperMixin,
     OrderListHelperMixin,
     OrderItemHelperMixin,
     OrderItemHelperMixin,
+    PurchaseDetailHelperMixin,
+    CommonUtilsMixin,
 )
 
 
-class UserListView(ListAPIView):
+class UserListView(UserHelperMixin, ListCreateAPIView):
     model = User
     queryset = model.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsManager]
 
+    def check_permissions(self, request):
+        self.permission_classes = [IsManager]
+        if request.method == 'POST' and self.user_is_unathentictaed(request):
+            self.permission_classes = []
+        return super().check_permissions(request)
+
     def get(self, request, *args, **kwargs):
-        if not request.user.groups.filter(name='SysAdmin'):
+        if not self.user_is_admin(request):
             self.queryset = self.queryset.exclude(groups__name='SysAdmin')
         return super().get(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        serialized_data = self.serializer_class(data=request.data)
+        serialized_data.is_valid(raise_exception=True)
+        self.perform_create(serialized_data)
+        return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
 
-class UserDetailView(UserIsRequestedUserMixin, RetrieveUpdateDestroyAPIView):
+class UserDetailView(UserHelperMixin, RetrieveUpdateDestroyAPIView):
     model = User
     queryset = model.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsCustomer]
+    permission_classes = [IsCustomerOrDeliveryCrew]
 
     def check_permissions(self, request):
+        self.permission_classes = [IsSystemAdministrotor]
         if self.user_is_requested_user(request):
-            self.permission_classes = [IsCustomer]
-        else:
-            self.permission_classes = [IsManager]
+            self.permission_classes = {IsCustomerOrDeliveryCrew}
+        elif self.user_is_admin(request):
+            pass
+        elif self.requested_user_is_admin(request):
+            pass
+        elif self.user_is_manager(request):
+            if self.requested_user_is_manager(request):
+                if request.method in ['GET']:
+                    self.permission_classes = [IsManager]
+            else:
+                self.permission_classes = [IsManager]
         return super().check_permissions(request)
+    
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class GroupListViewSet(ListCreateAPIView):
@@ -98,7 +126,8 @@ class GroupDetailView(ModelViewSet):
     serializer_class = GroupSerializer
 
     def check_permissions(self, request):
-        requested_group = Group.objects.get(pk=request.data.get('pk'))
+        pk = request.parser_context['kwargs']['pk']
+        requested_group = Group.objects.get(pk=pk)
         if request.method in ['GET']:
             if requested_group.name in ['SysAdmin']:
                 self.permission_classes = [IsSystemAdministrotor]
@@ -108,20 +137,30 @@ class GroupDetailView(ModelViewSet):
                 self.permission_classes = [IsManager]
             else: self.permission_classes = [IsSystemAdministrotor]
         return super().check_permissions(request)
+    
+    def get(self, request, *args, **kwargs):
+        group = Group.objects.get(pk=kwargs['pk'])
+        serialized_data = self.serializer_class(group)
+        return Response(serialized_data.data, status=status.HTTP_200_OK)
 
 
-class SysAdminListViewSet(ModelViewSet):
+class SysAdminListView(GroupListHelperMixin, ListAPIView):
     model = User
     queryset = model.objects.filter(groups__name='SysAdmin')
     serializer_class = UserSerializer
     permission_classes = [IsSystemAdministrotor]
+    group_name = 'SysAdmin'
 
 
-class SysAdminDetailViewSet(SysAdminListViewSet):
-    pass
+class SysAdminDetailViewSet(GroupDetailHelperMixin, RetrieveUpdateAPIView):
+    model = User
+    queryset = model.objects.filter(groups__name='SysAdmin')
+    serializer_class = UserSerializer
+    permission_classes = [IsSystemAdministrotor]
+    group_name = 'SysAdmin'
 
 
-class ManagerListViewSet(GroupManagerMixin, ListAPIView):
+class ManagerListView(GroupListHelperMixin, ListAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Manager').exclude(groups__name='SysAdmin')
     serializer_class = UserSerializer
@@ -135,22 +174,22 @@ class ManagerListViewSet(GroupManagerMixin, ListAPIView):
         return super().check_permissions(request)
 
 
-class ManagerDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
+class ManagerDetailView(UserHelperMixin, GroupDetailHelperMixin, RetrieveUpdateAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Manager').exclude(groups__name='SysAdmin')
     serializer_class = UserSerializer
+    group_name = 'Manager'
 
     def check_permissions(self, request):
-        if request.method in ['GET', 'PATCH', 'PUT', 'DELETE']:
-            if self.user_is_requested_user(request):
-                self.permission_classes = [IsManager]
-            else: self.permission_classes = [IsSystemAdministrotor]
-        else:
-            self.permission_classes = [IsSystemAdministrotor]
+        if self.user_is_requested_user(request):
+            self.permission_classes = [IsManager]
+        elif request.method in ['GET']:
+            self.permission_classes = [IsManager]
+        else: self.permission_classes = [IsSystemAdministrotor]
         return super().check_permissions(request)
 
 
-class DeliveryCrewListViewSet(GroupManagerMixin, ListAPIView):
+class DeliveryCrewListView(GroupListHelperMixin, ListAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Delivery Crew').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
@@ -158,67 +197,80 @@ class DeliveryCrewListViewSet(GroupManagerMixin, ListAPIView):
     group_name = 'Delivery Crew'
     
 
-class DeliveryCrewDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
+class DeliveryCrewDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Delivery Crew').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
-
-    def check_permissions(self, request):
-        if self.user_is_requested_user(request):
-            self.permission_classes = [IsDeliveryCrew]
-        else:
-            self.permission_classes = [IsManager]
-        return super().check_permissions(request)
+    permission_classes = [IsManager]
+    group_name = 'Delivery Crew'
 
 
-class CustomerListViewSet(ModelViewSet):
+class CustomerListView(GroupListHelperMixin, ListAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Customer').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
-
-    def check_permissions(self, request):
-        if request.method in ['POST']:
-            self.permission_classes = []
-        else:
-            self.permission_classes = [IsManager]
-        return super().check_permissions(request)
+    permission_classes = [IsManager]
+    group_name = 'Customer'
 
 
-class CustomerDetailViewSet(UserIsRequestedUserMixin, ModelViewSet):
+class CustomerDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
     model = User
     queryset = User.objects.filter(groups__name='Customer').exclude(groups__name='SysAdmin').exclude(groups__name='Manager')
     serializer_class = UserSerializer
-
-    def check_permissions(self, request):
-        if self.user_is_requested_user(request):
-            self.permission_classes = [IsCustomer]
-        else:
-            self.permission_classes = [IsManager]
-        return super().check_permissions(request)
+    permission_classes = [IsManager]
+    group_name = 'Customer'
 
 
-class CategoryListViewSet(CustomerCanSeeMixin, ModelViewSet):
+class CategoryListView(ModelViewSet):
     model = Category
     queryset = model.objects.all()
     serializer_class = CategorySerializer
 
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
 
-class CategoryDetailViewSet(CustomerCanSeeMixin, ModelViewSet):
+
+class CategoryDetailView(ModelViewSet):
     model = Category
     queryset = model.objects.all()
     serializer_class = CategorySerializer
 
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
 
-class MenuItemListViewSet(CustomerCanSeeMixin, ModelViewSet):
+
+class MenuItemListView(ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
 
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
 
-class MenuItemDetailViewSet(CustomerCanSeeMixin, ModelViewSet):
+
+class MenuItemDetailView(ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
 
 
 class CartView(CartViewHelperMixin, APIView):
@@ -228,25 +280,18 @@ class CartView(CartViewHelperMixin, APIView):
     permission_classes = [IsCustomer]
     related_model = OrderItem
 
-    # def check_permissions(self, request):
-    #     self.permission_classes = [IsManager]
-    #     if request.user.groups.exclude(name='Manager').filter(name='Customer'):
-    #         if request.user == self.get_requested_user(**request.parser_context['kwargs']):
-    #             self.permission_classes = [IsCustomer]
-    #     return super().check_permissions(request)
-
     def get(self, request, *args, **kwargs):
-        # user = self.get_requested_user(**kwargs)
         user = request.user
-        if user:
-            cart_object = self.get_or_create_cart_object(user)
-            return self.object_serialized_response(request, cart_object) 
-        else:
-            return Response({'message': 'only customers are allowed to own a cart'}, status=status.HTTP_400_BAD_REQUEST)
+        if not user.groups.filter(name='Customer') and len(user.groups) == 1:
+            return Response({'message': 'Only Customers are allowed to own a Cart'}, status=status.HTTP_400_BAD_REQUEST)
+        cart_object = self.get_or_create_cart_object(user)
+        return self.object_serialized_response(request, cart_object) 
 
     def post(self, request, *args, **kwargs):
+        user = request.user
+        if not user.groups.filter(name='Customer') and len(user.groups) == 1:
+            return Response({'message': 'Only Customers are allowed to own a Cart'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user = request.user
             order_item = OrderItem.objects.filter(user=user).get(pk=request.data.get('id'))
             self.add_order_item_to_cart(order_item, user)
             return Response({}, status=status.HTTP_200_OK)
@@ -255,8 +300,10 @@ class CartView(CartViewHelperMixin, APIView):
 
     def delete(self, request, *args, **kwargs):
         user = request.user
-        order_item_id = request.data.get('id')
+        if not user.groups.filter(name='Customer') and len(user.groups) == 1:
+            return Response({'message': 'Only Customers are allowed to own a Cart'}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            order_item_id = request.data.get('id')
             if order_item_id is None:
                 self.clear_orderitems(request, user)
             else:
@@ -277,17 +324,10 @@ class OrderItemListView(OrderItemHelperMixin, ListCreateAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsCustomer]
 
-    # def check_permissions(self, request):
-    #     self.permission_classes = [IsManager]
-    #     if request.user.groups.exclude(name='Manager').filter(name='Customer'):
-    #         if request.user == self.get_requested_user(**request.parser_context['kwargs']):
-    #             self.permission_classes = [IsCustomer]
-    #     return super().check_permissions(request)
-
     def get(self, request, *args, **kwargs):
-        # user = self.get_requested_user(**kwargs)
         user = request.user
-        self.queryset = self.queryset.filter(user=user)
+        if not user.groups.filter(name='Manager'):
+            self.queryset = self.queryset.filter(user=user)
         return super().get(request, *args, **kwargs)
     
     def post(self, request, **kwargs):
@@ -295,7 +335,7 @@ class OrderItemListView(OrderItemHelperMixin, ListCreateAPIView):
         data = self.data_dict_constructor(request, user, **kwargs)
         if data is None:
             return Response({'message': 'object not found'}, status=status.HTTP_404_NOT_FOUND)
-        order_item_obj = self.create_order_item_obj(data)
+        self.create_order_item_obj(data)
         return Response(status=status.HTTP_201_CREATED)
  
 
@@ -305,18 +345,12 @@ class OrderItemDetailView(OrderItemHelperMixin, APIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsCustomer]
 
-    # def check_permissions(self, request):
-    #     self.permission_classes = [IsManager]
-    #     if request.user.groups.exclude(name='Manager').filter(name='Customer'):
-    #         if request.user == self.get_requested_user(**request.parser_context['kwargs']):
-    #             self.permission_classes = [IsCustomer]
-    #     return super().check_permissions(request)
-
     def get(self, request, *args, **kwargs):
         try:
-            # user = self.get_requested_user(**kwargs)
             user = request.user
-            order_item_obj = self.queryset.filter(user=user).get(pk=kwargs['pk'])
+            if not user.groups.filter(name='Manager'):
+                self.queryset = self.queryset.filter(user=user)
+            order_item_obj = self.queryset.get(pk=kwargs['pk'])
             serialized_object = self.serializer_class(order_item_obj)
             return Response(serialized_object.data, status=status.HTTP_200_OK)
         except self.model.DoesNotExist:
@@ -324,10 +358,11 @@ class OrderItemDetailView(OrderItemHelperMixin, APIView):
 
     def patch(self, request, *args, **kwargs):
         try:
-            # user = self.get_requested_user(**kwargs)
             user = request.user
+            if not user.groups.filter(name='Manager'):
+                self.queryset = self.queryset.filter(user=user)
             if request.data.get('quantity') is not None:
-                order_item_obj = OrderItem.objects.filter(user=user).get(pk=kwargs['pk'])
+                order_item_obj = self.queryset.get(pk=kwargs['pk'])
                 order_item_obj.quantity = int(request.data.get('quantity'))
                 order_item_obj.price = order_item_obj.quantity * order_item_obj.menuitem.price
                 order_item_obj.save()
@@ -340,24 +375,37 @@ class OrderItemDetailView(OrderItemHelperMixin, APIView):
     
     def delete(self, request, *args, **kwargs):
         try:
-            # user = self.get_requested_user(**kwargs)
             user = request.user
-            order_item_obj = OrderItem.objects.filter(user=user).get(pk=kwargs['pk'])
+            if not user.groups.filter(name='Manager'):
+                self.queryset = self.queryset.filter(user=user)
+            order_item_obj = self.queryset.get(pk=kwargs['pk'])
             order_item_obj.delete()
             return Response({}, status=status.HTTP_200_OK)
         except OrderItem.DoesNotExist:
             return Response({'message': 'object not found'})
 
 
-class OrderListView(OrderListHelperMixin, ListCreateAPIView):
+class OrderListView(UserHelperMixin, OrderListHelperMixin, ListCreateAPIView):
     model = Order
     queryset = model.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsCustomer]
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        elif request.method in ['POST']:
+            self.permission_classes = [IsCustomer]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
 
     def get(self, request, *args, **kwargs):
-        user = request.user
-        self.queryset = self.queryset.filter(user=user)
+        if self.user_is_admin(request): pass
+        elif self.user_is_manager(request): pass
+        elif self.user_is_delivery_crew(request):
+            self.queryset = self.queryset.filter(delivery_crew=request.user)
+        elif self.user_is_customer(request):
+            self.queryset = self.queryset.filter(user=request.user)
         return super().get(request, *args, **kwargs)
     
     def post(self, request):
@@ -374,11 +422,53 @@ class OrderListView(OrderListHelperMixin, ListCreateAPIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class OrderDetailView(RetrieveUpdateDestroyAPIView):
+class OrderDetailView(UserHelperMixin, CommonUtilsMixin, RetrieveUpdateDestroyAPIView):
     model = Order
     queryset = model.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsCustomer]
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        elif request.method in ['PATCH']:
+            self.permission_classes = [IsDeliveryCrew]
+            if request.data.get('delivery_crew_id'):
+                self.permission_classes = [IsManager]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.groups.filter(name='Manager'):
+            pass #self.queryset = self.queryset
+        elif user.groups.filter(name='Customer'):
+            self.queryset = self.queryset.filter(user=user)
+        elif user.groups.filter(name='Delivery Crew'):
+            self.queryset = self.queryset.filter(delivery_crew=user)
+        return super().get(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        status = request.data.get('status')
+        delivery_crew_id = request.data.get('delivery_crew_id')
+        try:
+            if self.user_is_admin(request): pass
+            elif self.user_is_manager(request): pass
+            elif self.user_is_delivery_crew(request):
+                self.queryset = self.queryset.filter(delivery_crew=request.user)
+            order_object = self.queryset.get(pk=kwargs['pk'])
+            if status is not None:
+                if int(status) < 0 or int(status) > 1: raise ValueError
+                order_object.status = int(status)
+                order_object.save()
+            if delivery_crew_id is not None:
+                order_object.delivery_crew = User.objects.get(pk=delivery_crew_id)
+                order_object.save()
+            return self.object_serialized_response(request, order_object)
+        except Purchase.DoesNotExist:
+            return Response({'message': 'object not found'}, status=status.HTTP_404_BAD_REQUEST)
+        except ValueError:
+            return Response({'status': 'requires a valid integer (0 or 1)', 'id': 'requires a valid inetger'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PurchaseListView(ListAPIView):
@@ -393,18 +483,50 @@ class PurchaseListView(ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class PurchaseDetailView(RetrieveAPIView):
+class PurchaseDetailView(PurchaseDetailHelperMixin, RetrieveAPIView, DestroyAPIView):
     model = Purchase
     queryset = model.objects.all()
     serializer_class = PurchaseSerializer
-    permission_classes = [IsCustomer]
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomer]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        self.queryset = self.queryset.filter(user=user)
+        return super().get(*args, **kwargs)
 
 
-class PurchaseItemListView(RetrieveAPIView):
+class PurchaseItemListView(ListAPIView):
     model = PurchaseItem
     queryset = model.objects.all()
     serializer_class = PurchaseItemSerializer
+    permission_classes = [IsCustomer]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        self.queryset = self.queryset.filter(user=user)
+        return super().get(request, *args, **kwargs)
 
 
-class PurchaseItemDetailView(PurchaseItemListView):
-    pass
+class PurchaseItemDetailView(RetrieveUpdateDestroyAPIView):
+    model = PurchaseItem
+    queryset = model.objects.all()
+    serializer_class = PurchaseItemSerializer
+    permission_classes = [IsCustomer]
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomer]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        self.queryset = self.queryset.filter(user=user)
+        return super().get(*args, **kwargs)
