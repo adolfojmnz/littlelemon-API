@@ -7,9 +7,9 @@ class PermissionBaseMixin(BasePermission):
     def has_permission(self, request, view):
         if not bool(request.user and request.user.is_authenticated):
             return False
-        if not request.user.groups.filter(name=self.group):
-            return False
-        return True
+        if request.user.groups.filter(name=self.group):
+            return True
+        return False
 
 
 class IsSystemAdministrotor(PermissionBaseMixin):
@@ -26,3 +26,15 @@ class IsDeliveryCrew(PermissionBaseMixin):
 
 class IsCustomer(PermissionBaseMixin):
     group = 'Customer'
+
+
+class IsCustomerOrDeliveryCrew(BasePermission):
+
+    def has_permission(self, request, view):
+        if not bool(request.user and request.user.is_authenticated):
+            return False
+        if request.user.groups.filter(name='Customer'):
+            return True
+        if request.user.groups.filter(name='Delivery Crew'):
+            return True
+        return False
