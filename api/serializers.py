@@ -71,4 +71,8 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'user', 'purchase', 'delivery_crew', 'delivered', 'total', 'date']
+        fields = ['id', 'user', 'purchase', 'delivery_crew', 'status', 'total', 'date']
+        read_only = ['id', 'user', 'purchase', 'delivery_crew', 'total', 'date']
+        extra_kwargs = {
+            'delivery_crew_id': {'write_only': True},
+        }
