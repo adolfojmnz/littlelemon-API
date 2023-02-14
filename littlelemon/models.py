@@ -70,7 +70,7 @@ class Order(models.Model):
         related_name = 'delivery_crew',
         null = True, blank = True,
     )
-    delivered = models.BooleanField(db_index=True, default=0)
+    status = models.BooleanField(db_index=True, default=0)
     total = models.DecimalField(max_digits=6, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True, db_index=True)
 
