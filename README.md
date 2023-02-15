@@ -58,7 +58,55 @@ python manage.py runserver
 
 # API endpoints and usage explanation
 
-*For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best.*
+For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best. I also added filtering, searching, and ordering capabilities for some of the endpoints. The available fields for reach endpoint are specified in the Endpoint section further bellow. 
+
+**The usage of such capabilities is as follow**:
+
+**filtering**
+
+```bash
+curl -X GET localhost:8000/api/users?title=Latte \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer {token}"
+```
+
+Note: *Filtering searches for an exact match of the passed string to the query parameter. It returns an empty list if no matches were found.*
+
+**Search**
+
+```bash
+curl -X GET localhost:8000/api/users?search=coffe \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer {token}"
+```
+
+Note: *Search searches for any match of the passed string in all the lookup fields defined for the endpoint. It is case insensitive and may return results than partially or exactly match the passed string. For the above example, if there is an object with a title “Irish Coffee” and another with a category “Coffee”, both of them will be returned.*
+
+**Ordering**
+
+```bash
+curl -X GET localhost:8000/api/users?ordering=price,title \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer {token}"
+```
+
+Note: *Ordering sorts the returns elements by the given criteria, by default it does it in ascending order, but it can be reversed by appending the minus sign (-) before the ordering criteria. In the above example, the ordering criteria are price and title, therefore all the returned elements are sorted in ascending order by price, and then by title.* 
+
+**Filtering, search, and ordering together**
+
+```bash
+curl -X GET localhost:8000/api/users?category=Coffe&search=coffe&ordering=price,title \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer {token}"
+```
+
+All these functionalities can be used separately or in conjunction with one another. As shown in the above example, start appending the question mark (?), -after the endpoint URL-, add a query (such as ***search),*** and subsequently separated queries with an ampersand (&). 
+
+Here it is again:
+
+```bash
+?category=Coffe&search=coffe&ordering=-price,title  
+```
 
 ## Roles
 
@@ -93,6 +141,13 @@ curl -X POST localhost:8000/api/users \
    -H 'Content-Type: application/json' \
    -d '{"username": "{username}", "password": "{password}", "email": "{email}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ username, first_name, last_name
+
+</aside>
 
 **/api/users/{userId}**
 
@@ -219,7 +274,7 @@ curl -X DELETE localhost:8000/api/groups/{groupId} \
 
 ### Group Customer
 
-**/api/groups/customer**
+**/api/groups/customers**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
 | --- | --- | --- | --- |
@@ -238,6 +293,13 @@ curl -X POST localhost:8000/api/groups/customers \
 	 -H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ username, first_name, last_name
+
+</aside>
 
 **/api/groups/customers/{userId}**
 
@@ -284,6 +346,13 @@ curl -X POST localhost:8000/api/groups/delivery-crew \
 	 -H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ username, first_name, last_name
+
+</aside>
 
 **/api/groups/delivery-crew/{userId}**
 
@@ -332,6 +401,13 @@ curl -X POST localhost:8000/api/groups/managers \
    -d '{"id": "{userId}"}'
 ```
 
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ username, first_name, last_name
+
+</aside>
+
 **/api/groups/managers/{userId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -376,6 +452,13 @@ curl -X POST localhost:8000/api/groups/admins \
 	 -H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ username, first_name, last_name
+
+</aside>
 
 **/api/groups/admins/{userId}**
 
@@ -423,6 +506,13 @@ curl -X POST localhost:8000/api/menu-items \
 	 -H "Authorization: Bearer {token}"      \
 	 -d '{"title": "{title}", "price": "{value}", "feature": "{value}", "category_id": "{id}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ title, price, featured, category
+
+</aside>
 
 **/api/menu-items/{menu-itemId}**
 
@@ -474,6 +564,13 @@ curl -X POST localhost:8000/api/categories \
 	 -d '{"title": "{title}", "slug": "{slug}"}'
 ```
 
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ title, slug
+
+</aside>
+
 **/api/categories/{categoryId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -499,6 +596,32 @@ curl -X DELETE localhost:8000/api/categories/{categoryId} \
    -H 'Content-Type: application/json'                   \
 	 -H "Authorization: Bearer {token}" 
 ```
+
+### Menu Items Per Category
+
+**/api/categories/{categoryId}/menu-items**
+
+| ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
+| --- | --- | --- | --- |
+| Customer | GET | Retrieve the list of menu-items associated with the category | None |
+| Delivery Crew | GET | Retrieve the list of menu-items associated with the category | None |
+| Manager | GET | Retrieve the list of menu-items, add new menu-items | None |
+| Admin | GET | Retrieve the list of menu-items, add new menu-items | None |
+
+**Usage**:
+
+```bash
+curl -X GET localhost:8000/api/menu-items \
+   -H 'Content-Type: application/json'    \
+	 -H "Authorization: Bearer {token}"
+```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ title, price, featured
+
+</aside>
 
 ### Order Items
 
@@ -526,6 +649,13 @@ curl -X POST localhost:8000/api/order-items \
 	 -H "Authorization: Bearer {token}"       \
    -d '{"id": "{menu-itemId}", "quantity": "{value}"}'
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ user, menuitem
+
+</aside>
 
 **/api/order-items/{order-itemId}**
 
@@ -611,6 +741,13 @@ curl -X POST localhost:8000/api/orders \
 
 This procedure ensures that a user doesn’t add repeated menu-items to the order-items giving its unique together (user, menu-item) constraint and, once the order has been created, deletes the order-item allowing the user to create new orders with the same menu-items.
 
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ user, delivery_crew, status, date
+
+</aside>
+
 **/api/orders/{orderId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -658,6 +795,13 @@ curl -X GET localhost:8000/api/purchases \
 	 -H "Authorization: Bearer {token}"
 ```
 
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ user, date
+
+</aside>
+
 **/api/purchases/{purchaseId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -701,6 +845,13 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
    -H 'Content-Type: application/json'  \
 	 -H "Authorization: Bearer {token}"  
 ```
+
+**Searching, ordering and filtering fields**:
+
+<aside>
+▶️ user, menuitem, price
+
+</aside>
 
 **/api/purchase-items/{purchase-itemId}**
 
