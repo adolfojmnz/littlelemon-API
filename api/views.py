@@ -259,6 +259,25 @@ class CategoryDetailView(ModelViewSet):
         return super().check_permissions(request)
 
 
+class CategoryMenuItemsView(ListAPIView):
+    model = MenuItem
+    queryset = model.objects.all()
+    serializer_class = MenuItemSerializer
+    ordering_fields = ['title', 'price']
+    search_fields = ['title', 'price']
+
+    def check_permissions(self, request):
+        if request.method in ['GET']:
+            self.permission_classes = [IsCustomerOrDeliveryCrew]
+        else:
+            self.permission_classes = [IsManager]
+        return super().check_permissions(request)
+    
+    def get(self, request, *args, **kwargs):
+        self.queryset = self.queryset.filter(category__pk=kwargs['pk'])
+        return super().get(request, *args, **kwargs)
+
+
 class MenuItemListView(ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
