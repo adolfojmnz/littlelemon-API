@@ -63,9 +63,9 @@ class UserListView(UserHelperMixin, ListCreateAPIView):
     queryset = model.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsManager]
-    ordering_fields = ['username', 'name', 'lastname', 'groups']
-    search_fields = ['username', 'name', 'lastname']
-    filterset_fields = ['username', 'name', 'lastname']
+    ordering_fields = ['username', 'first_name', 'last_name', 'groups']
+    search_fields = ['username', 'first_name', 'last_name']
+    filterset_fields = ['username', 'first_name', 'last_name']
 
     def check_permissions(self, request):
         self.permission_classes = [IsManager]
@@ -153,9 +153,9 @@ class SysAdminListView(GroupListHelperMixin, ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsSystemAdministrotor]
     group_name = 'SysAdmin'
-    ordering_fields = ['username', 'name', 'lastname']
-    search_fields = ['username', 'name', 'lastname']
-    filterset_fields = ['username', 'name', 'lastname']
+    ordering_fields = ['username', 'first_name', 'last_name']
+    search_fields = ['username', 'first_name', 'last_name']
+    filterset_fields = ['username', 'first_name', 'last_name']
 
 
 class SysAdminDetailViewSet(GroupDetailHelperMixin, RetrieveUpdateAPIView):
@@ -171,9 +171,9 @@ class ManagerListView(GroupListHelperMixin, ListAPIView):
     queryset = User.objects.filter(groups__name='Manager').exclude(groups__name='SysAdmin')
     serializer_class = UserSerializer
     group_name = 'Manager'
-    ordering_fields = ['username', 'name', 'lastname']
-    search_fields = ['username', 'name', 'lastname']
-    filterset_fields = ['username', 'name', 'lastname']
+    ordering_fields = ['username', 'first_name', 'last_name']
+    search_fields = ['username', 'first_name', 'last_name']
+    filterset_fields = ['username', 'first_name', 'last_name']
 
     def check_permissions(self, request):
         if request.method in ['POST', 'GET']:
@@ -204,9 +204,9 @@ class DeliveryCrewListView(GroupListHelperMixin, ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsManager]
     group_name = 'Delivery Crew'
-    ordering_fields = ['username', 'name', 'lastname']
-    search_fields = ['username', 'name', 'lastname']
-    filterset_fields = ['username', 'name', 'lastname']
+    ordering_fields = ['username', 'first_name', 'last_name']
+    search_fields = ['username', 'first_name', 'last_name']
+    filterset_fields = ['username', 'first_name', 'last_name']
     
 
 class DeliveryCrewDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
@@ -223,9 +223,9 @@ class CustomerListView(GroupListHelperMixin, ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsManager]
     group_name = 'Customer'
-    ordering_fields = ['username', 'name', 'lastname']
-    search_fields = ['username', 'name', 'lastname']
-    filterset_fields = ['username', 'name', 'lastname']
+    ordering_fields = ['username', 'first_name', 'last_name']
+    search_fields = ['username', 'first_name', 'last_name']
+    filterset_fields = ['username', 'first_name', 'last_name']
 
 
 class CustomerDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
