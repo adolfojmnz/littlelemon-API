@@ -65,6 +65,7 @@ class UserListView(UserHelperMixin, ListCreateAPIView):
     permission_classes = [IsManager]
     ordering_fields = ['username', 'name', 'lastname', 'groups']
     search_fields = ['username', 'name', 'lastname']
+    filterset_fields = ['username', 'name', 'lastname']
 
     def check_permissions(self, request):
         self.permission_classes = [IsManager]
@@ -154,6 +155,7 @@ class SysAdminListView(GroupListHelperMixin, ListAPIView):
     group_name = 'SysAdmin'
     ordering_fields = ['username', 'name', 'lastname']
     search_fields = ['username', 'name', 'lastname']
+    filterset_fields = ['username', 'name', 'lastname']
 
 
 class SysAdminDetailViewSet(GroupDetailHelperMixin, RetrieveUpdateAPIView):
@@ -171,6 +173,7 @@ class ManagerListView(GroupListHelperMixin, ListAPIView):
     group_name = 'Manager'
     ordering_fields = ['username', 'name', 'lastname']
     search_fields = ['username', 'name', 'lastname']
+    filterset_fields = ['username', 'name', 'lastname']
 
     def check_permissions(self, request):
         if request.method in ['POST', 'GET']:
@@ -203,6 +206,7 @@ class DeliveryCrewListView(GroupListHelperMixin, ListAPIView):
     group_name = 'Delivery Crew'
     ordering_fields = ['username', 'name', 'lastname']
     search_fields = ['username', 'name', 'lastname']
+    filterset_fields = ['username', 'name', 'lastname']
     
 
 class DeliveryCrewDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
@@ -221,6 +225,7 @@ class CustomerListView(GroupListHelperMixin, ListAPIView):
     group_name = 'Customer'
     ordering_fields = ['username', 'name', 'lastname']
     search_fields = ['username', 'name', 'lastname']
+    filterset_fields = ['username', 'name', 'lastname']
 
 
 class CustomerDetailView(GroupDetailHelperMixin, RetrieveUpdateAPIView):
@@ -237,6 +242,7 @@ class CategoryListView(ModelViewSet):
     serializer_class = CategorySerializer
     ordering_fields = ['title', 'slug']
     search_fields = ['title', 'slug']
+    filterset_fields = ['title', 'slug']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -265,6 +271,7 @@ class CategoryMenuItemsView(ListAPIView):
     serializer_class = MenuItemSerializer
     ordering_fields = ['title', 'price']
     search_fields = ['title', 'price']
+    filterset_fields = ['title', 'price']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -276,7 +283,7 @@ class CategoryMenuItemsView(ListAPIView):
     def get(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(category__pk=kwargs['pk'])
         return super().get(request, *args, **kwargs)
-
+    
 
 class MenuItemListView(ModelViewSet):
     model = MenuItem
@@ -284,6 +291,7 @@ class MenuItemListView(ModelViewSet):
     serializer_class = MenuItemSerializer
     ordering_fields = ['title', 'price', 'featured', 'category']
     search_fields = ['title', 'price']
+    filterset_fields = ['title', 'price']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -358,6 +366,7 @@ class OrderItemListView(OrderItemHelperMixin, ListCreateAPIView):
     permission_classes = [IsCustomer]
     ordering_fields = ['user', 'menuitem']
     search_fields = ['user', 'menuitem']
+    filterset_fields = ['user', 'menuitem']
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -426,6 +435,7 @@ class OrderListView(UserHelperMixin, OrderListHelperMixin, ListCreateAPIView):
     serializer_class = OrderSerializer
     ordering_fields = ['user', 'delivery_crew', 'status', 'date']
     search_fields = ['user', 'delivery_crew', 'status', 'date']
+    filterset_fields = ['user', 'delivery_crew', 'status', 'date']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -515,6 +525,7 @@ class PurchaseListView(ListAPIView):
     permission_classes = [IsCustomer]
     ordering_fields = ['user', 'date']
     search_fields = ['user', 'date']
+    filterset_fields = ['user', 'date']
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -547,6 +558,7 @@ class PurchaseItemListView(ListAPIView):
     permission_classes = [IsCustomer]
     ordering_fields = ['user', 'menuitem', 'price']
     search_fields = ['user', 'menuitem', 'price']
+    filterset_fields = ['user', 'menuitem', 'price']
 
     def get(self, request, *args, **kwargs):
         user = request.user
