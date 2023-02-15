@@ -269,9 +269,9 @@ class CategoryMenuItemsView(ListAPIView):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
-    ordering_fields = ['title', 'price']
-    search_fields = ['title', 'price']
-    filterset_fields = ['title', 'price']
+    ordering_fields = ['title', 'price', 'featured']
+    search_fields = ['title', 'price', 'featured']
+    filterset_fields = ['title', 'price', 'featured']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -290,8 +290,8 @@ class MenuItemListView(ModelViewSet):
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
     ordering_fields = ['title', 'price', 'featured', 'category']
-    search_fields = ['title', 'price']
-    filterset_fields = ['title', 'price']
+    search_fields = ['title', 'price', 'featured', 'category']
+    filterset_fields = ['title', 'price', 'featured', 'category']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
