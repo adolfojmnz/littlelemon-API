@@ -514,6 +514,10 @@ curl -X POST localhost:8000/api/menu-items \
 
 </aside>
 
+*The category query parameter accept both integer (for category ID) and string (for category title).*
+
+The feature query parameter accepts bool values such as 1, 0, True and False.
+
 **/api/menu-items/{menu-itemId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -623,6 +627,8 @@ curl -X GET localhost:8000/api/menu-items \
 
 </aside>
 
+The feature query parameter accepts bool values such as 1, 0, True and False.
+
 ### Order Items
 
 **/api/order-items**
@@ -656,6 +662,8 @@ curl -X POST localhost:8000/api/order-items \
 ▶️ user, menuitem
 
 </aside>
+
+*For both user and menuitem, pass an integer (userId or menu-itemId) to look for.*
 
 **/api/order-items/{order-itemId}**
 
@@ -748,6 +756,12 @@ This procedure ensures that a user doesn’t add repeated menu-items to the orde
 
 </aside>
 
+*For both user and delivery_crew, pass an integer (userId or delivery_crewId) to look for.*
+
+For status, pass a boolean value such as 1, 0, True, and False.
+
+For date, pass a datetime sting such as 2023-02-16T19:36:15.043310Z
+
 **/api/orders/{orderId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -802,6 +816,10 @@ curl -X GET localhost:8000/api/purchases \
 
 </aside>
 
+*For user pass an integer (userId) to look for.*
+
+For date, pass a datetime sting such as 2023-02-16T19:36:15.043310Z
+
 **/api/purchases/{purchaseId}**
 
 | ROLE | ALLOWED METHODS | ACTIONS | RESTRICTIONS WITHIN ALLOWED METHODS |
@@ -852,6 +870,8 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
 ▶️ user, menuitem, price
 
 </aside>
+
+*For both user and menuitem, pass an integer (userId or menu-itemId) to look for.*
 
 **/api/purchase-items/{purchase-itemId}**
 

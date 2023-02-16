@@ -1742,7 +1742,11 @@ curl -X POST localhost:8000/api/menu-items \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">title, price, featured, category</div>
 			</figure>
-			<p id="a8d1f1d9-ccfa-4a92-950a-6db829a0fa91" class="">
+			<p id="a8d1f1d9-ccfa-4a92-950a-6db829a0fa91" class=""><em>The category query parameter accept both integer
+					(for category ID) and string (for category title).</em></p>
+			<p id="01dc5b39-e094-4aa2-baf5-92e743c0d765" class="">The feature query parameter accepts bool values such
+				as 1, 0, True and False.</p>
+			<p id="3a14f025-4e44-4f55-ae6b-3fa199eb07cd" class="">
 			</p>
 			<p id="cca99ba9-8ca9-4a7b-8299-6d291efe17fb" class=""><strong>/api/menu-items/{menu-itemId}</strong></p>
 			<table id="14ea8098-3939-4af0-82b7-c9d0f9c51089" class="simple-table">
@@ -1978,8 +1982,8 @@ curl -X DELETE localhost:8000/api/categories/{categoryId} \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">title, price, featured</div>
 			</figure>
-			<p id="f119ce6d-1c16-4463-957a-80f7bf1a17cd" class="">
-			</p>
+			<p id="f119ce6d-1c16-4463-957a-80f7bf1a17cd" class="">The feature query parameter accepts bool values such
+				as 1, 0, True and False.</p>
 			<h3 id="d261d386-8aa3-45e6-86ae-751032c45125" class="">Order Items</h3>
 			<p id="842a2262-0a94-4a43-96a7-2e24731aeb45" class=""><strong>/api/order-items</strong></p>
 			<table id="0ccbb414-69d7-4763-81fc-82c8cb2d2953" class="simple-table">
@@ -2040,7 +2044,9 @@ curl -X POST localhost:8000/api/order-items \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">user, menuitem</div>
 			</figure>
-			<p id="88b83f0b-2da7-4a02-954b-3f49fd52034f" class="">
+			<p id="88b83f0b-2da7-4a02-954b-3f49fd52034f" class=""><em>For both user and menuitem, pass an integer
+					(userId or menu-itemId) to look for.</em></p>
+			<p id="a1ca7ff6-a2dd-4197-89de-44a7e2c80975" class="">
 			</p>
 			<p id="a01e656f-5b66-4949-a5af-e1c7fb2670c7" class=""><strong>/api/order-items/{order-itemId}</strong></p>
 			<table id="99a11345-bead-44c0-bf75-c97518b85a58" class="simple-table">
@@ -2208,7 +2214,13 @@ curl -X POST localhost:8000/api/orders \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">user, delivery_crew, status, date</div>
 			</figure>
-			<p id="b797d6f6-4d08-41d8-9827-3befd4822c18" class="">
+			<p id="b797d6f6-4d08-41d8-9827-3befd4822c18" class=""><em>For both user and delivery_crew, pass an integer
+					(userId or delivery_crewId) to look for.</em></p>
+			<p id="798d1465-72f1-4af7-a48a-20ec930e2f1d" class="">For status, pass a boolean value such as 1, 0, True,
+				and False.</p>
+			<p id="90bc2fdb-ee62-4486-a6dd-6cada27cc9d1" class="">For date, pass a datetime sting such as
+				2023-02-16T19:36:15.043310Z</p>
+			<p id="b7cff1d0-867d-48b9-b4f3-14631abe291b" class="">
 			</p>
 			<p id="fd508a3b-125b-4eb3-8191-789efbc054d6" class=""><strong>/api/orders/{orderId}</strong></p>
 			<table id="ae6c30ff-7f3a-4fa9-bc24-fe8d79717504" class="simple-table">
@@ -2326,7 +2338,11 @@ curl -X DELETE localhost:8000/api/orders/{orderId}  \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">user, date</div>
 			</figure>
-			<p id="15804617-bb7a-4474-9034-d20e9400e2a6" class="">
+			<p id="15804617-bb7a-4474-9034-d20e9400e2a6" class=""><em>For user pass an integer (userId) to look
+					for.</em></p>
+			<p id="c531a68f-78b9-4cf6-9076-349660b99319" class="">For date, pass a datetime sting such as
+				2023-02-16T19:36:15.043310Z</p>
+			<p id="5c811f13-7098-48e9-8609-7c111d205abd" class="">
 			</p>
 			<p id="6b81e3ad-359f-49d9-81d1-f9af993c60e5" class=""><strong>/api/purchases/{purchaseId}</strong></p>
 			<table id="db7720db-faad-4c05-8455-053192506207" class="simple-table">
@@ -2438,7 +2454,11 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
 				<div style="font-size:1.5em"><span class="icon">▶️</span></div>
 				<div style="width:100%">user, menuitem, price</div>
 			</figure>
-			<p id="8c691fd7-eea2-46b5-82df-299252f93bf3" class=""><strong>/api/purchase-items/{purchase-itemId}</strong>
+			<p id="8c691fd7-eea2-46b5-82df-299252f93bf3" class=""><em>For both user and menuitem, pass an integer
+					(userId or menu-itemId) to look for.</em></p>
+			<p id="9d39642e-c226-4e82-9aff-1921b6c916b7" class="">
+			</p>
+			<p id="f6401868-fa26-40d8-813f-b433eb3f8d01" class=""><strong>/api/purchase-items/{purchase-itemId}</strong>
 			</p>
 			<table id="5ee43bab-6867-42a0-a5b9-58d87365d937" class="simple-table">
 				<thead class="simple-table-header">
