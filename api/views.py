@@ -63,7 +63,7 @@ class UserListView(UserHelperMixin, ListCreateAPIView):
     queryset = model.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsManager]
-    ordering_fields = ['username', 'first_name', 'last_name', 'groups']
+    ordering_fields = ['username', 'first_name', 'last_name']
     search_fields = ['username', 'first_name', 'last_name']
     filterset_fields = ['username', 'first_name', 'last_name']
 
@@ -289,9 +289,9 @@ class MenuItemListView(ModelViewSet):
     model = MenuItem
     queryset = model.objects.all()
     serializer_class = MenuItemSerializer
-    ordering_fields = ['title', 'price', 'featured', 'category']
-    search_fields = ['title', 'price', 'featured', 'category']
-    filterset_fields = ['title', 'price', 'featured', 'category']
+    ordering_fields = ['title', 'price', 'featured']
+    search_fields = ['title', 'price', 'featured']
+    filterset_fields = ['title', 'price', 'featured']
 
     def check_permissions(self, request):
         if request.method in ['GET']:
@@ -299,6 +299,16 @@ class MenuItemListView(ModelViewSet):
         else:
             self.permission_classes = [IsManager]
         return super().check_permissions(request)
+    
+    def get_queryset(self):
+        query_param_value = self.request.query_params.get('category')
+        if query_param_value is not None:
+            try:
+                category = Category.objects.get(pk=int(query_param_value))
+            except ValueError:
+                category = Category.objects.get(title=query_param_value)
+            self.queryset = self.queryset.filter(category=category)
+        return super().get_queryset()
 
 
 class MenuItemDetailView(ModelViewSet):
