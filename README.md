@@ -22,10 +22,6 @@ This app contains the URLs dispatchers (routers), serializers, and the views for
 
 This directory contains the configuration files of the project, such as the [settings.py](http://settings.py) file and the [urls.py](http://urls.py) file which contains the main URL dispatchers of the the project.
 
-**Note for the peers that will review this project**:
-
-Please be aware that I made certain things different from what is was required, but I met every criteria. I just developed the project in the way that felt right to me. Some of my entity relationships (models) are different as well as the logic within them I even added extra entities and extra constraints. I suggest you read this documentation in order to understand the whole project before attempting to test its endpoints. If you have any doubt, feel free to contact me via email at adolfoj@protonmail.com.
-
 ## Installation
 
 **Clone the repository**
