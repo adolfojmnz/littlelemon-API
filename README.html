@@ -894,7 +894,7 @@
 			<p id="d5725b10-1c8b-44d0-b35b-44d99ffb1925" class=""><strong>The usage of such capabilities is as
 					follow</strong>:</p>
 			<p id="a7d9f41d-5f3a-48a5-84ba-c8b790676ac7" class=""><strong>filtering</strong></p>
-			<pre id="a7be0545-ed11-476b-b28c-f7a662f6495c" class="code"><code>curl -X GET localhost:8000/api/users?title=Latte \
+			<pre id="a7be0545-ed11-476b-b28c-f7a662f6495c" class="code"><code>curl -X GET localhost:8000/api/menu-items?title=Latte \
    -H &#x27;Content-Type: application/json&#x27; \
    -H &quot;Authorization: Bearer {token}&quot;</code></pre>
 			<p id="8bc877d8-e7e0-4092-aa88-d87e5bccfc7c" class="">Note: <em>Filtering searches for an exact match of the
@@ -902,7 +902,7 @@
 			<p id="2d7b24e7-cf0b-4d5c-95db-177b609e9271" class="">
 			</p>
 			<p id="e0041307-52bd-4065-9e64-cf17657f0a7a" class=""><strong>Search</strong></p>
-			<pre id="d3aac460-91cf-46a3-b47d-028a6eaf2e1a" class="code"><code>curl -X GET localhost:8000/api/users?search=coffe \
+			<pre id="d3aac460-91cf-46a3-b47d-028a6eaf2e1a" class="code"><code>curl -X GET localhost:8000/api/menu-items?search=coffe \
    -H &#x27;Content-Type: application/json&#x27; \
    -H &quot;Authorization: Bearer {token}&quot;</code></pre>
 			<p id="85332216-71fa-4f78-88be-e367273bb517" class="">Note: <em>Search searches for any match of the passed
@@ -913,7 +913,7 @@
 			<p id="e19af20d-ef11-44fe-8121-2f74fa2aac5c" class="">
 			</p>
 			<p id="067f206b-5f74-4b50-9117-bef5340b0e0b" class=""><strong>Ordering</strong></p>
-			<pre id="fd152ce2-860e-44b3-bc91-eeefbe4dcd7b" class="code"><code>curl -X GET localhost:8000/api/users?ordering=price,title \
+			<pre id="fd152ce2-860e-44b3-bc91-eeefbe4dcd7b" class="code"><code>curl -X GET localhost:8000/api/menu-items?ordering=price,title \
    -H &#x27;Content-Type: application/json&#x27; \
    -H &quot;Authorization: Bearer {token}&quot;</code></pre>
 			<p id="f5da4c8d-cd14-471d-932b-6a72b44277d1" class="">Note: <em>Ordering sorts the returns elements by the
@@ -925,7 +925,7 @@
 			</p>
 			<p id="fe789618-0648-4af6-b51e-40ea57b14276" class=""><strong>Filtering, search, and ordering
 					together</strong></p>
-			<pre id="bfa27eab-bdb9-4d78-8319-6c99a8f4a3e7" class="code"><code>curl -X GET localhost:8000/api/users?category=Coffe&amp;search=coffe&amp;ordering=price,title \
+			<pre id="bfa27eab-bdb9-4d78-8319-6c99a8f4a3e7" class="code"><code>curl -X GET localhost:8000/api/menu-items?category=Coffee&amp;search=coffee&amp;ordering=price,title \
    -H &#x27;Content-Type: application/json&#x27; \
    -H &quot;Authorization: Bearer {token}&quot;</code></pre>
 			<p id="11b4eade-b2e9-4efd-a78c-5351a0bdefe3" class="">All these functionalities can be used separately or in
@@ -934,7 +934,7 @@
 				separated queries with an ampersand (&amp;). </p>
 			<p id="6a35a999-4bf3-4f67-9c70-caaab226f405" class="">Here it is again:</p>
 			<pre id="2678d909-e3b6-429c-92b7-cec3faeafa41"
-				class="code"><code>?category=Coffe&amp;search=coffe&amp;ordering=-price,title  </code></pre>
+				class="code"><code>?category=Coffee&amp;search=coffee&amp;ordering=-price,title  </code></pre>
 			<p id="d113c061-2ada-42db-ac89-37ef06fd5add" class="">
 			</p>
 			<h2 id="3a92252a-3655-4699-8037-d2504ed9c31f" class="">Roles</h2>

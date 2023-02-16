@@ -65,7 +65,7 @@ For the examples, I added code snippets for usage with curl, but feel free to us
 **filtering**
 
 ```bash
-curl -X GET localhost:8000/api/users?title=Latte \
+curl -X GET localhost:8000/api/menu-items?title=Latte \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer {token}"
 ```
@@ -75,7 +75,7 @@ Note: *Filtering searches for an exact match of the passed string to the query p
 **Search**
 
 ```bash
-curl -X GET localhost:8000/api/users?search=coffe \
+curl -X GET localhost:8000/api/menu-items?search=coffe \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer {token}"
 ```
@@ -85,7 +85,7 @@ Note: *Search searches for any match of the passed string in all the lookup fiel
 **Ordering**
 
 ```bash
-curl -X GET localhost:8000/api/users?ordering=price,title \
+curl -X GET localhost:8000/api/menu-items?ordering=price,title \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer {token}"
 ```
@@ -95,7 +95,7 @@ Note: *Ordering sorts the returns elements by the given criteria, by default it 
 **Filtering, search, and ordering together**
 
 ```bash
-curl -X GET localhost:8000/api/users?category=Coffe&search=coffe&ordering=price,title \
+curl -X GET localhost:8000/api/menu-items?category=Coffee&search=coffee&ordering=price,title \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer {token}"
 ```
@@ -105,7 +105,7 @@ All these functionalities can be used separately or in conjunction with one anot
 Here it is again:
 
 ```bash
-?category=Coffe&search=coffe&ordering=-price,title  
+?category=Coffee&search=coffee&ordering=-price,title  
 ```
 
 ## Roles
