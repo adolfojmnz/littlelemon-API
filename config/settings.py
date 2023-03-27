@@ -1,11 +1,17 @@
+import environ, os
 from pathlib import Path
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-v1z3+6q=b1_sqvc^g6leb)k_x5n!fzra5vcvp5n^ycktrbki$-'
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, 'config/.env'))
 
-DEBUG = True
+DEBUG = env('DEBUG')
+
+SECRET_KEY = 'django-insecure-v1z3+6q=b1_sqvc^g6leb)k_x5n!fzra5vcvp5n^ycktrbki$-'
 
 ALLOWED_HOSTS = []
 
@@ -62,8 +68,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DATABASE_NAME'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
     }
 }
 

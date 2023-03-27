@@ -17,6 +17,7 @@ bleach = "*"
 django-filter = "*"
 djangorestframework-simplejwt = "~=5.2.2"
 django-environ = "*"
+psycopg2 = {extras = ["binary"], version = "*"}
 
 [dev-packages]
 
