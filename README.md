@@ -2,7 +2,7 @@
 
 # Description
 
-The LittleLemon API is the final project for the [APIs Course](https://www.coursera.org/learn/apis) part of the [Meta BackEnd Developer Professional Certificate](https://www.coursera.org/professional-certificates/meta-back-end-developer) on [Coursera](https://www.coursera.org/). 
+The LittleLemon API is the final assignment for the [APIs Course](https://www.coursera.org/learn/apis) part of the [Meta BackEnd Developer Professional Certificate](https://www.coursera.org/professional-certificates/meta-back-end-developer) on [Coursera](https://www.coursera.org/).
 
 The API entpoints for this project, provides functionality to create, edit and delete users, roles for each user, such as Customer, Delivery Crew or Manager, menu items, categories for menu-items,  shopping cart and orders. Every API endpoint have authorization and permissions constraints as well as throttling, pagination and filtering.
 
@@ -12,15 +12,15 @@ This project consist mainly of two apps, *littlelemon* and *api*.
 
 **littlelemon app**
 
-This app contains the models definition to create the entity relationships required by *api* app.
+This app contains the models definition to create the entities relationships required by *api* app.
 
 **api app**
 
-This app contains the URLs dispatchers (routers), serializers, and the views for every endpoint of the API. Additionally, it contains helpers (mixins) that are inherited by the class-based views.  
+This app contains the URLs dispatchers (routers), serializers, and the views for every endpoint of the API. Additionally, it contains helpers (mixins) that are inherited by the class-based views.
 
 **config dir**
 
-This directory contains the configuration files of the project, such as the [settings.py](http://settings.py) file and the [urls.py](http://urls.py) file which contains the main URL dispatchers of the the project.
+This directory contains the configuration files of the project, such as the `settings.py` file and the `urls.py` file which contains the main URL dispatchers of the the project.
 
 ## Installation
 
@@ -44,7 +44,7 @@ G**enerate and apply the migrations**
 python manage.py makemigrations && python manage.py migrate
 ```
 
-The default sqlite3 database is included in the repository, therefore, the above commands are not required, but if you wish to use a different database, make the pertinent configurations, and generate and apply the migrations.
+The default sqlite3 database is included in the repository, therefore, the above commands are not required, but if you wish to use a different database, make the pertinent configurations, and apply the migrations.
 
 **Run the server**
 
@@ -54,7 +54,7 @@ python manage.py runserver
 
 # API endpoints and usage explanation
 
-For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best. I also added filtering, searching, and ordering capabilities for some of the endpoints. The available fields for reach endpoint are specified in the Endpoint section further bellow. 
+For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best. I also added filtering, searching, and ordering capabilities for some of the endpoints. The available fields for reach endpoint are specified in the Endpoint section further bellow.
 
 **The usage of such capabilities is as follow**:
 
@@ -62,7 +62,7 @@ For the examples, I added code snippets for usage with curl, but feel free to us
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?title=Latte \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -H "Authorization: Bearer {token}"
 ```
 
@@ -72,7 +72,7 @@ Note: *Filtering searches for an exact match of the passed string to the query p
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?search=coffe \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -H "Authorization: Bearer {token}"
 ```
 
@@ -82,26 +82,26 @@ Note: *Search searches for any match of the passed string in all the lookup fiel
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?ordering=price,title \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -H "Authorization: Bearer {token}"
 ```
 
-Note: *Ordering sorts the returns elements by the given criteria, by default it does it in ascending order, but it can be reversed by appending the minus sign (-) before the ordering criteria. In the above example, the ordering criteria are price and title, therefore all the returned elements are sorted in ascending order by price, and then by title.* 
+Note: *Ordering sorts the returns elements by the given criteria, by default it does it in ascending order, but it can be reversed by appending the minus sign (-) before the ordering criteria. In the above example, the ordering criteria are price and title, therefore all the returned elements are sorted in ascending order by price and then by title.*
 
 **Filtering, search, and ordering together**
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?category=Coffee&search=coffee&ordering=price,title \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -H "Authorization: Bearer {token}"
 ```
 
-All these functionalities can be used separately or in conjunction with one another. As shown in the above example, start appending the question mark (?), -after the endpoint URL-, add a query (such as ***search),*** and subsequently separated queries with an ampersand (&). 
+All these functionalities can be used separately or in conjunction with one another. As shown in the above example, start appending the question mark (?), -after the endpoint URL-, add a query (such as ***search),*** and subsequently separated queries with an ampersand (&).
 
 Here it is again:
 
 ```bash
-?category=Coffee&search=coffee&ordering=-price,title  
+?category=Coffee&search=coffee&ordering=-price,title
 ```
 
 ## Roles
@@ -130,11 +130,11 @@ Usage:
 
 ```bash
 curl -X GET localhost:8000/api/users \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/users \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -d '{"username": "{username}", "password": "{password}", "email": "{email}"}'
 ```
 
@@ -158,16 +158,16 @@ curl -X POST localhost:8000/api/users \
 
 ```bash
 curl -X GET localhost:8000/api/users/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	 -H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/users/{userId} \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
 	 -H "Authorization: Bearer {token}"  \
    -d '{"email": "{email}"}'
 
 curl -X DELETE localhost:8000/api/users/{userId} \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
 	 -H "Authorization: Bearer {token}"
 ```
 
@@ -186,7 +186,7 @@ curl -X DELETE localhost:8000/api/users/{userId} \
 
 ```bash
 curl -X POST localhost:8000/api/token/login/ \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -d '{"username": "{username}", "password": "{password}"}'
 ```
 
@@ -203,7 +203,7 @@ curl -X POST localhost:8000/api/token/login/ \
 
 ```bash
 curl -X POST localhost:8000/api/token/refresh/ \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -d '{"refresh": "{refreshToken}"}'
 ```
 
@@ -218,7 +218,7 @@ curl -X POST localhost:8000/api/token/refresh/ \
 
 ```bash
 curl -X POST localhost:8000/api/token/blacklist/ \
-   -H 'Content-Type: application/json' \
+   -H "Content-Type: application/json" \
    -d '{"refresh": "{refreshToken}"}'
 ```
 
@@ -235,12 +235,12 @@ curl -X POST localhost:8000/api/token/blacklist/ \
 
 ```bash
 curl -X GET localhost:8000/api/groups \
-   -H 'Content-Type: application/json'\
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json"\
+   -H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/groups \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}" \
    -d '{"name": "{groupName}"}'
 ```
 
@@ -255,17 +255,17 @@ curl -X POST localhost:8000/api/groups \
 
 ```bash
 curl -X GET localhost:8000/api/groups/{groupId} \
-   -H 'Content-Type: application/json'
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/groups/{groupId} \
-   -H 'Content-Type: application/json'
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"name": "{groupName}"}'
 
 curl -X DELETE localhost:8000/api/groups/{groupId} \
-   -H 'Content-Type: application/json'
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Group Customer
@@ -281,12 +281,12 @@ curl -X DELETE localhost:8000/api/groups/{groupId} \
 
 ```bash
 curl -X GET localhost:8000/api/groups/customers \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/groups/customers \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
 
@@ -308,17 +308,17 @@ curl -X POST localhost:8000/api/groups/customers \
 
 ```bash
 curl -X GET localhost:8000/api/groups/customers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/groups/customers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"username": "{username}"}'
 
 curl -X DELETE localhost:8000/api/groups/customers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Group Delivery Crew
@@ -334,12 +334,12 @@ curl -X DELETE localhost:8000/api/groups/customers/{userId} \
 
 ```bash
 curl -X GET localhost:8000/api/groups/delivery-crew \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/groups/delivery-crew \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
 
@@ -362,17 +362,17 @@ curl -X POST localhost:8000/api/groups/delivery-crew \
 
 ```bash
 curl -X GET localhost:8000/api/groups/delivery-crew/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/groups/delivery-crew/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"username": "{username}"}'
 
 curl -X DELETE localhost:8000/api/groups/delivery-crew/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Group Manager
@@ -388,12 +388,12 @@ curl -X DELETE localhost:8000/api/groups/delivery-crew/{userId} \
 
 ```bash
 curl -X GET localhost:8000/api/groups/managers \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/groups/managers \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
 
@@ -415,17 +415,17 @@ curl -X POST localhost:8000/api/groups/managers \
 
 ```bash
 curl -X GET localhost:8000/api/groups/managers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/groups/managers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"username": "{username}"}'
 
 curl -X DELETE localhost:8000/api/groups/managers/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Group Admin
@@ -440,12 +440,12 @@ curl -X DELETE localhost:8000/api/groups/managers/{userId} \
 
 ```bash
 curl -X GET localhost:8000/api/groups/admins \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/groups/admins \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"id": "{userId}"}'
 ```
 
@@ -466,17 +466,17 @@ curl -X POST localhost:8000/api/groups/admins \
 
 ```bash
 curl -X GET localhost:8000/api/groups/admins/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/groups/admins/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"username": "{username}"}'
 
 curl -X DELETE localhost:8000/api/groups/admins/{userId} \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Menu Items
@@ -494,13 +494,13 @@ curl -X DELETE localhost:8000/api/groups/admins/{userId} \
 
 ```bash
 curl -X GET localhost:8000/api/menu-items \
-   -H 'Content-Type: application/json'    \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"    \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/menu-items \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"      \
-	 -d '{"title": "{title}", "price": "{value}", "feature": "{value}", "category_id": "{id}"}'
+   -H "Content-Type: application/json"     \
+	-H "Authorization: Bearer {token}"      \
+	-d '{"title": "{title}", "price": "{value}", "feature": "{value}", "category_id": "{id}"}'
 ```
 
 **Searching, ordering and filtering fields**:
@@ -527,17 +527,17 @@ The feature query parameter accepts bool values such as 1, 0, True and False.
 
 ```bash
 curl -X GET localhost:8000/api/menu-items/{menu-itemId} \
-   -H 'Content-Type: application/json'    \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"    \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/menu-items/{menu-itemId} \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"      \
-	 -d '{"title": "{title}", "price": "{value}", "feature": "{value}", "category_id": "{id}"}'
+   -H "Content-Type: application/json"     \
+	-H "Authorization: Bearer {token}"      \
+	-d '{"title": "{title}", "price": "{value}", "feature": "{value}", "category_id": "{id}"}'
 
 curl -X DELETE localhost:8000/api/menu-items/{menu-itemId} \
-   -H 'Content-Type: application/json'    \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"    \
+   -H "Authorization: Bearer {token}"
 ```
 
 ### Categories
@@ -555,13 +555,13 @@ curl -X DELETE localhost:8000/api/menu-items/{menu-itemId} \
 
 ```bash
 curl -X GET localhost:8000/api/categories \
-   -H 'Content-Type: application/json'    \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"    \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/categories \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"      \
-	 -d '{"title": "{title}", "slug": "{slug}"}'
+   -H "Content-Type: application/json"     \
+	-H "Authorization: Bearer {token}"      \
+	-d '{"title": "{title}", "slug": "{slug}"}'
 ```
 
 **Searching, ordering and filtering fields**:
@@ -584,17 +584,17 @@ curl -X POST localhost:8000/api/categories \
 
 ```bash
 curl -X GET localhost:8000/api/categories/{categoryId} \
-   -H 'Content-Type: application/json'                 \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"                 \
+   -H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/categories/{categoryId} \
-   -H 'Content-Type: application/json'                   \ 
-	 -H "Authorization: Bearer {token}"                    \
-	 -d '{"title": "{title}", "slug": "{slug}"}'
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}" \
+	-d '{"title": "{title}", "slug": "{slug}"}'
 
 curl -X DELETE localhost:8000/api/categories/{categoryId} \
-   -H 'Content-Type: application/json'                   \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 ### Menu Items Per Category
@@ -612,8 +612,8 @@ curl -X DELETE localhost:8000/api/categories/{categoryId} \
 
 ```bash
 curl -X GET localhost:8000/api/menu-items \
-   -H 'Content-Type: application/json'    \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 **Searching, ordering and filtering fields**:
@@ -643,12 +643,12 @@ While creating an order-item the default user will be automatically set to the c
 
 ```bash
 curl -X GET localhost:8000/api/order-items \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"     \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/order-items \
-   -H 'Content-Type: application/json'      \
-	 -H "Authorization: Bearer {token}"       \
+   -H "Content-Type: application/json"      \
+	-H "Authorization: Bearer {token}"       \
    -d '{"id": "{menu-itemId}", "quantity": "{value}"}'
 ```
 
@@ -673,17 +673,17 @@ curl -X POST localhost:8000/api/order-items \
 
 ```bash
 curl -X GET localhost:8000/api/order-items/{order-itemId} \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"     \
+   -H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/order-items/{order-itemId} \
-   -H 'Content-Type: application/json'      \
-	 -H "Authorization: Bearer {token}"       \
+   -H "Content-Type: application/json"      \
+	-H "Authorization: Bearer {token}"       \
    -d '{"quantity": "{menu-itemId}"}'
 
 curl -X DELETE localhost:8000/api/order-items/{order-itemId} \
-   -H 'Content-Type: application/json'     \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"     \
+   -H "Authorization: Bearer {token}"
 ```
 
 ### Cart
@@ -698,22 +698,22 @@ curl -X DELETE localhost:8000/api/order-items/{order-itemId} \
 
 ```bash
 curl -X GET localhost:8000/api/cart    \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/cart   \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer {token}"  \
    -d '{"id": "{order-itemId}"}'
 
 curl -X DELETE localhost:8000/api/cart \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"  \
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"  \
    -d '{"id": "{order-itemId}"}'
 
 curl -X DELETE localhost:8000/api/cart \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
 A DELETE request requires the id of the order-item that should be deleted. If no id is provided, all the order-items in the cart will be deleted.
@@ -733,15 +733,15 @@ A DELETE request requires the id of the order-item that should be deleted. If no
 
 ```bash
 curl -X GET localhost:8000/api/orders  \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer {token}"
 
 curl -X POST localhost:8000/api/orders \
-   -H 'Content-Type: application/json' \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json" \
+	-H "Authorization: Bearer {token}"
 ```
 
-*A **POST** request creates a new order with the order-items present in the user’s cart. This request creates purchase-items instances from the order-items, and adds them to a Purchase instance which will be added to an Order instance. The last step is to delete all the order-items from the cart.*  
+*A **POST** request creates a new order with the order-items present in the user’s cart. This request creates purchase-items instances from the order-items, and adds them to a Purchase instance which will be added to an Order instance. The last step is to delete all the order-items from the cart.*
 
 This procedure ensures that a user doesn’t add repeated menu-items to the order-items giving its unique together (user, menu-item) constraint and, once the order has been created, deletes the order-item allowing the user to create new orders with the same menu-items.
 
@@ -771,17 +771,17 @@ For date, pass a datetime sting such as 2023-02-16T19:36:15.043310Z
 
 ```bash
 curl -X GET localhost:8000/api/orders/{orderId}  \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json"  \
+   -H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/orders/{orderId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"   \
+   -H "Content-Type: application/json"  \
+   -H "Authorization: Bearer {token}"   \
    -d '{"status": "{value}"}'
 
 curl -X DELETE localhost:8000/api/orders/{orderId}  \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}" 
+   -H "Content-Type: application/json"  \
+	-H "Authorization: Bearer {token}"
 ```
 
 *Allowed status values are 0 and 1, for True and False respectively.*
@@ -801,8 +801,8 @@ curl -X DELETE localhost:8000/api/orders/{orderId}  \
 
 ```bash
 curl -X GET localhost:8000/api/purchases \
-   -H 'Content-Type: application/json'   \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"   \
+   -H "Authorization: Bearer {token}"
 ```
 
 **Searching, ordering and filtering fields**:
@@ -829,12 +829,12 @@ For date, pass a datetime sting such as 2023-02-16T19:36:15.043310Z
 
 ```bash
 curl -X GET localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"  \
+	-H "Authorization: Bearer {token}"
 
 curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"  
+   -H "Content-Type: application/json"  \
+   -H "Authorization: Bearer {token}"
 ```
 
 ### Purchase Items
@@ -852,12 +852,12 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
 
 ```bash
 curl -X GET localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"  \
+	-H "Authorization: Bearer {token}"
 
 curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"  
+   -H "Content-Type: application/json"  \
+   -H "Authorization: Bearer {token}"
 ```
 
 **Searching, ordering and filtering fields**:
@@ -882,15 +882,15 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
 
 ```bash
 curl -X GET localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"
+   -H "Content-Type: application/json"  \
+	-H "Authorization: Bearer {token}"
 
 curl -X PATCH localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"   \
+   -H "Content-Type: application/json"  \
+   -H "Authorization: Bearer {token}"   \
    -d '{"quantity": "{value}"}'
 
 curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
-   -H 'Content-Type: application/json'  \
-	 -H "Authorization: Bearer {token}"  
+   -H "Content-Type: application/json"  \
+	-H "Authorization: Bearer {token}"
 ```
