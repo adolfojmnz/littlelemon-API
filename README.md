@@ -37,20 +37,104 @@ pipenv install
 ```
 
 Note that I use [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) but is included within the repository and not as a dependency. [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) has some bugs that creates a compatibility error with the latest version of [DjangoRestFramework](https://www.django-rest-framework.org/), I made the corrections that I needed, and added it to the project as a local app to avoid such compatibility errors.
+<br> <br>
 
-G**enerate and apply the migrations**
+# Database Setup
 
-```bash
-python manage.py makemigrations && python manage.py migrate
+The project uses a PostgreSQL database. Configured as follows
+
+```python
+DATABASES = {
+    'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DATABASE_NAME'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+    },
+}
 ```
 
-The default sqlite3 database is included in the repository, therefore, the above commands are not required, but if you wish to use a different database, make the pertinent configurations, and apply the migrations.
+<aside>
+    💡 If you do not have an existing database and user to use with these settings, follow the
+    instructions bellow and create new ones.
+</aside>
+<br>
 
-**Run the server**
+### Enter The PostgreSQL Prompt
+
+```sql
+psql -U postgres -d postgres
+```
+
+### Create The Database
+
+```sql
+CREATE DATABASE <database_name>;
+```
+
+### Create The User
+
+```sql
+CREATE USER <username> WITH ENCRYPTED PASSWORD '<password>';
+```
+
+### Modifying Connection Parameters
+
+```sql
+ALTER ROLE <database_user> SET client_encoding TO 'utf8';
+ALTER ROLE <database_user> SET default_transaction_isolation TO 'read committed';
+ALTER ROLE <database_user> SET timezone TO 'UTC';
+```
+
+### Grant Permissions To The User
+
+```sql
+ GRANT ALL PRIVILEGES ON DATABASE <database_name> TO <username>;
+```
+
+### Exit The Prompt
+
+```sql
+\q
+```
+<br>
+
+
+# Environment Variables
+
+### Create The Environment Variables File **(.env)**
+
+In the Django project directory *(chat-room-api/config/)*, create the **.env** file and add to it the following
+
+```python
+DEBUG=<boolean_value>
+DATABASE_NAME=<your_database_name>
+DATABASE_HOST=<your_database_host>
+DATABASE_PORT=<your_database_port>
+DATABASE_USER=<your_database_user>
+DATABASE_PASSWORD=<your_database_password>
+```
+<aside>
+    💡 Be aware that <em>django-environ</em> is required. Such dependency should be installed
+    by running <em>pipenv install</em>
+</aside>
+<br>
+
+### Apply the migrations
+
+```python
+python manage.py migrate
+```
+
+### Run the server
 
 ```bash
 python manage.py runserver
 ```
+<br>
+<br>
 
 # API endpoints and usage explanation
 
