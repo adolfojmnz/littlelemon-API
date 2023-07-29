@@ -4,23 +4,23 @@
 
 The LittleLemon API is the final assignment for the [APIs Course](https://www.coursera.org/learn/apis) part of the [Meta BackEnd Developer Professional Certificate](https://www.coursera.org/professional-certificates/meta-back-end-developer) on [Coursera](https://www.coursera.org/).
 
-The API entpoints for this project, provides functionality to create, edit and delete users, roles for each user, such as Customer, Delivery Crew or Manager, menu items, categories for menu-items,  shopping cart and orders. Every API endpoint have authorization and permissions constraints as well as throttling, pagination and filtering.
+The API endpoints for this project provide the functionality to create, edit and delete users, roles for each user, such as Customer, Delivery Crew or Manager, menu items, categories for menu items,  shopping cart, and orders. Every API endpoint has authorization and permissions constraints as well as throttling, pagination, and filtering.
 
 ## Project Structure
 
-This project consist mainly of two apps, *littlelemon* and *api*.
+This project consists mainly of two apps, *littlelemon* and *api*.
 
 **littlelemon app**
 
-This app contains the models definition to create the entities relationships required by *api* app.
+This app contains the models' definition to create the entity relationships required by the *api* app.
 
 **api app**
 
-This app contains the URLs dispatchers (routers), serializers, and the views for every endpoint of the API. Additionally, it contains helpers (mixins) that are inherited by the class-based views.
+This app contains the URLs dispatchers (routers), serializers, and views for every endpoint of the API. Additionally, it contains helpers classes that are inherited by class-based views.
 
 **config dir**
 
-This directory contains the configuration files of the project, such as the `settings.py` file and the `urls.py` file which contains the main URL dispatchers of the the project.
+This directory contains the configuration files of the project, such as the `settings.py` file and the `urls.py` file which contains the main URL dispatchers of the project.
 
 ## Installation
 
@@ -36,7 +36,7 @@ git clone https://github.com/Eadwulf/littlelemon.git && cd littlelemon
 pipenv install
 ```
 
-Note that I use [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) but is included within the repository and not as a dependency. [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) has some bugs that creates a compatibility error with the latest version of [DjangoRestFramework](https://www.django-rest-framework.org/), I made the corrections that I needed, and added it to the project as a local app to avoid such compatibility errors.
+Note that I use [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) but is included within the repository and not as a dependency. [Djoser](https://djoser.readthedocs.io/en/latest/introduction.html) has some bugs that create a compatibility error with the latest version of [DjangoRestFramework](https://www.django-rest-framework.org/), I made the corrections that I needed and added it to the project as a local app to avoid such compatibility errors.
 <br> <br>
 
 # Database Setup
@@ -58,7 +58,7 @@ DATABASES = {
 
 <aside>
     💡 If you do not have an existing database and user to use with these settings, follow the
-    instructions bellow and create new ones.
+    instructions below and create new ones.
 </aside>
 <br>
 
@@ -138,9 +138,7 @@ python manage.py runserver
 
 # API endpoints and usage explanation
 
-For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best. I also added filtering, searching, and ordering capabilities for some of the endpoints. The available fields for reach endpoint are specified in the Endpoint section further bellow.
-
-**The usage of such capabilities is as follow**:
+For the examples, I added code snippets for usage with curl, but feel free to use whatever tool suits you best. I also added filtering, searching, and ordering capabilities for some of the endpoints. The available fields for each endpoint are specified in the Endpoint section further below.
 
 **filtering**
 
@@ -152,7 +150,7 @@ curl -X GET localhost:8000/api/menu-items?title=Latte \
 
 Note: *Filtering searches for an exact match of the passed string to the query parameter. It returns an empty list if no matches were found.*
 
-**Search**
+**Searching**
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?search=coffe \
@@ -172,7 +170,7 @@ curl -X GET localhost:8000/api/menu-items?ordering=price,title \
 
 Note: *Ordering sorts the returns elements by the given criteria, by default it does it in ascending order, but it can be reversed by appending the minus sign (-) before the ordering criteria. In the above example, the ordering criteria are price and title, therefore all the returned elements are sorted in ascending order by price and then by title.*
 
-**Filtering, search, and ordering together**
+**Filtering, searching, and ordering together**
 
 ```bash
 curl -X GET localhost:8000/api/menu-items?category=Coffee&search=coffee&ordering=price,title \
@@ -180,7 +178,7 @@ curl -X GET localhost:8000/api/menu-items?category=Coffee&search=coffee&ordering
    -H "Authorization: Bearer {token}"
 ```
 
-All these functionalities can be used separately or in conjunction with one another. As shown in the above example, start appending the question mark (?), -after the endpoint URL-, add a query (such as ***search),*** and subsequently separated queries with an ampersand (&).
+All these functionalities can be used separately or in conjunction with one another. As shown in the above example, start appending the question mark (?), -after the endpoint URL-, add a query (such as ***search),*** and subsequently separate queries with an ampersand (&).
 
 Here it is again:
 
@@ -222,7 +220,7 @@ curl -X POST localhost:8000/api/users \
    -d '{"username": "{username}", "password": "{password}", "email": "{email}"}'
 ```
 
-**Searching, ordering and filtering fields**:
+**Searching, ordering, and filtering fields**:
 
 <aside>
 ▶️ username, first_name, last_name
@@ -736,14 +734,14 @@ curl -X POST localhost:8000/api/order-items \
    -d '{"id": "{menu-itemId}", "quantity": "{value}"}'
 ```
 
-**Searching, ordering and filtering fields**:
+**Searching, ordering, and filtering fields**:
 
 <aside>
-▶️ user, menuitem
+▶️ user, menu item
 
 </aside>
 
-*For both user and menuitem, pass an integer (userId or menu-itemId) to look for.*
+*For both user and menu item, pass an integer (userId or menu-itemId) to look for.*
 
 **/api/order-items/{order-itemId}**
 
@@ -898,7 +896,7 @@ curl -X GET localhost:8000/api/purchases \
 
 *For user pass an integer (userId) to look for.*
 
-For date, pass a datetime sting such as 2023-02-16T19:36:15.043310Z
+For date, pass a DateTime string such as 2023-02-16T19:36:15.043310Z
 
 **/api/purchases/{purchaseId}**
 
@@ -944,7 +942,7 @@ curl -X DELETE localhost:8000/api/purchases/{purchaseId} \
    -H "Authorization: Bearer {token}"
 ```
 
-**Searching, ordering and filtering fields**:
+**Searching, ordering, and filtering fields**:
 
 <aside>
 ▶️ user, menuitem, price
