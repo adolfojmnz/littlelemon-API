@@ -27,7 +27,7 @@ This directory contains the configuration files of the project, such as the `set
 **Clone the repository**
 
 ```bash
-git clone https://github.com/Eadwulf/littlelemon.git && cd littlelemon
+git clone https://github.com/adolfojmnz/littlelemon.git && cd littlelemon
 ```
 
 **Create the virtual environment and install the dependencies**
